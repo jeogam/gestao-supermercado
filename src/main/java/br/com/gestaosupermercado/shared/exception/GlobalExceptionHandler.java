@@ -11,6 +11,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * Converte exceções em {@link ErroResponse}. Erros inesperados nunca expõem detalhes internos ao cliente;
@@ -48,6 +49,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErroResponse> handleAccessDeniedException(final RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ErroResponse.of(HttpStatus.FORBIDDEN.value(), "Você não tem permissão para esta operação."));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErroResponse> handleNoResourceFoundException(final NoResourceFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErroResponse.of(HttpStatus.NOT_FOUND.value(), "Recurso não encontrado."));
     }
 
     @ExceptionHandler(Exception.class)

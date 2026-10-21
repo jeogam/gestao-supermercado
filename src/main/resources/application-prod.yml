@@ -1,0 +1,30 @@
+# Perfil de produção, pensado para hospedagem gratuita (pouca memória, banco remoto que hiberna).
+spring:
+  datasource:
+    hikari:
+      # Plano gratuito de banco aceita poucas conexões; poucas conexões também economizam memória.
+      maximum-pool-size: 5
+      minimum-idle: 1
+      # Banco serverless (ex.: Neon) pode levar alguns segundos para acordar.
+      connection-timeout: 20000
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  shutdown: graceful
+  tomcat:
+    threads:
+      max: 50
+
+springdoc:
+  # Swagger desligado em produção; ligue com SWAGGER_ENABLED=true se precisar.
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:false}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}

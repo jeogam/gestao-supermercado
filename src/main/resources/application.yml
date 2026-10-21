@@ -33,6 +33,24 @@ app:
       email: ${ADMIN_EMAIL:}
       senha: ${ADMIN_SENHA:}
 
+server:
+  # PORT é a variável que plataformas como o Render injetam. A variável SERVER_PORT (usada no .env local)
+  # é lida diretamente pelo Spring e tem prioridade sobre este valor.
+  port: ${PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      # /actuator/health/liveness não toca o banco: é o alvo do ping que impede a hospedagem de dormir
+      # sem manter um banco serverless acordado (o que consumiria a cota gratuita dele).
+      probes:
+        enabled: true
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

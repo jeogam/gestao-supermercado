@@ -50,7 +50,13 @@ Pré-requisitos: JDK 21+ e Docker.
 3. Rode a API: `./mvnw spring-boot:run`
 
 Na primeira subida, com o banco vazio, o Administrador é criado com `ADMIN_EMAIL`/`ADMIN_SENHA`.
-Documentação da API: http://localhost:8080/swagger-ui.html
+Documentação da API: http://localhost:8080/swagger-ui.html (ou a porta definida em `SERVER_PORT`)
+
+Para subir banco e API juntos em containers (como em um servidor): `docker compose up -d --build`.
+
+## Deploy
+
+Passo a passo para publicar de graça (Render + Neon) em [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Testes
 

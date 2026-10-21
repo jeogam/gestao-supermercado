@@ -1,13 +1,16 @@
+# Desenvolvimento: `docker compose up -d db` e rode a API pela IDE ou `./mvnw spring-boot:run`.
+# Servidor/VM: `docker compose up -d --build` sobe banco + API, reiniciando sozinhos se caírem.
 services:
   db:
     image: postgres:17-alpine
     container_name: gestao_supermercado_db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: gestao_supermercado
       POSTGRES_USER: ${DB_USERNAME:-gestao}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD no .env}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - gestao_supermercado_db_data:/var/lib/postgresql/data
     healthcheck:
@@ -15,6 +18,23 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  api:
+    build: .
+    container_name: gestao_supermercado_api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Dentro da rede do compose o banco é o serviço `db`, na porta interna 5432,
+      # e a API escuta sempre na 8080; SERVER_PORT do .env só define a porta exposta no host.
+      DB_URL: jdbc:postgresql://db:5432/gestao_supermercado
+      SERVER_PORT: 8080
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 768m
 
 volumes:
   gestao_supermercado_db_data:

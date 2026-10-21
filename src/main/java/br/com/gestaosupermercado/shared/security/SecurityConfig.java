@@ -28,7 +28,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * API stateless: autenticação por Bearer JWT e autorização por permissão via {@code @PreAuthorize}.
- * Tudo exige autenticação, exceto os endpoints de login/refresh/logout e a documentação.
+ * Tudo exige autenticação, exceto login/refresh/logout, a documentação e o health check.
  *
  * @since 0.0.1
  */
@@ -48,6 +48,12 @@ public class SecurityConfig {
             "/v3/api-docs/**"
     };
 
+    private static final String[] ROTAS_MONITORAMENTO = {
+            "/actuator/health",
+            "/actuator/health/liveness",
+            "/actuator/health/readiness"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http,
                                                    final UsuarioJwtAuthenticationConverter usuarioJwtAuthenticationConverter,
@@ -58,6 +64,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, ROTAS_PUBLICAS).permitAll()
                         .requestMatchers(ROTAS_DOCUMENTACAO).permitAll()
+                        .requestMatchers(HttpMethod.GET, ROTAS_MONITORAMENTO).permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(usuarioJwtAuthenticationConverter))

@@ -1,0 +1,24 @@
+# Blueprint do Render (plano gratuito). O banco fica fora do Render (Neon), porque o Postgres gratuito
+# do Render é apagado 30 dias após a criação.
+services:
+  - type: web
+    name: gestao-supermercado-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health/liveness
+    autoDeploy: true
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_SENHA
+        sync: false
