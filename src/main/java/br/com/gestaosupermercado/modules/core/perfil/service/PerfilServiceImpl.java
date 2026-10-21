@@ -4,6 +4,7 @@ import br.com.gestaosupermercado.modules.core.perfil.dto.request.PerfilRequest;
 import br.com.gestaosupermercado.modules.core.perfil.dto.response.PerfilResponse;
 import br.com.gestaosupermercado.modules.core.perfil.model.Perfil;
 import br.com.gestaosupermercado.modules.core.perfil.repository.PerfilRepository;
+import br.com.gestaosupermercado.modules.core.permissao.enums.Permissao;
 import br.com.gestaosupermercado.shared.exception.BusinessException;
 import br.com.gestaosupermercado.shared.exception.MensagemErro;
 import java.util.HashSet;
@@ -81,7 +82,7 @@ public class PerfilServiceImpl implements PerfilService {
     }
 
     /**
-     * O perfil do sistema (Administrador) é imutável pela API: editá-lo ou inativá-lo poderia deixar a loja
+     * O perfil do sistema (Superadmin) é imutável pela API: editá-lo ou inativá-lo poderia deixar a loja
      * sem ninguém capaz de gerir acessos.
      */
     private Perfil findPerfilEditavelById(final Long id) {
@@ -93,7 +94,11 @@ public class PerfilServiceImpl implements PerfilService {
     }
 
     private PerfilResponse toPerfilResponse(final Perfil perfil) {
+        // Superadmin tem todas as permissões por código (ver PermissaoEfetivaService); a tela mostra isso.
+        final List<Permissao> permissoes = perfil.isSistema()
+                ? List.of(Permissao.values())
+                : perfil.getPermissoes().stream().sorted().toList();
         return new PerfilResponse(perfil.getId(), perfil.getNome(), perfil.getDescricao(), perfil.isAtivo(), perfil.isSistema(),
-                perfil.getPermissoes().stream().sorted().toList());
+                permissoes);
     }
 }

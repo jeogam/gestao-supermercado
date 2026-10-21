@@ -27,7 +27,7 @@ app:
       max-tentativas: 5
       tempo-bloqueio: 15m
   bootstrap:
-    # Cria o primeiro Administrador somente quando ainda não existe nenhum usuário.
+    # Cria o primeiro Superadmin somente quando ainda não existe nenhum usuário.
     admin:
       nome: ${ADMIN_NOME:Administrador}
       email: ${ADMIN_EMAIL:}

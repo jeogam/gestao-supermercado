@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import br.com.gestaosupermercado.modules.core.permissao.enums.Permissao;
 import com.jayway.jsonpath.JsonPath;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +25,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 /**
  * Fluxo ponta a ponta de acesso contra um PostgreSQL real (migrations Flyway incluídas): login, RBAC
- * dinâmico, inativação, rotação de refresh token e proteção do último Administrador.
+ * dinâmico, inativação, rotação de refresh token e proteção do último Superadmin.
  */
 @Testcontainers
 @AutoConfigureMockMvc
@@ -54,13 +55,40 @@ class CoreAcessoIT {
     }
 
     @Test
-    void shouldReturnAllPermissoesForBootstrapAdministrador() throws Exception {
+    void shouldReturnEveryPermissaoForBootstrapSuperadmin() throws Exception {
         final String accessToken = loginAccessToken(ADMIN_EMAIL, ADMIN_SENHA);
 
         mockMvc.perform(get("/api/v1/core/usuarios/me").header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value(ADMIN_EMAIL))
-                .andExpect(jsonPath("$.permissoes", Matchers.hasItems("USUARIO_CRIAR", "PERFIL_EDITAR", "PERMISSAO_LISTAR")));
+                .andExpect(jsonPath("$.perfis[0].nome").value("Superadmin"))
+                .andExpect(jsonPath("$.permissoes", Matchers.hasSize(Permissao.values().length)));
+    }
+
+    @Test
+    void shouldGrantEachPerfilOnlyItsOwnArea() throws Exception {
+        final String adminToken = loginAccessToken(ADMIN_EMAIL, ADMIN_SENHA);
+
+        assertPermissoesOfPerfil(adminToken, "Caixa",
+                "PRODUTO_LISTAR", "VENDA_CANCELAR", "VENDA_LISTAR", "VENDA_REGISTRAR");
+        assertPermissoesOfPerfil(adminToken, "Estoquista",
+                "COMPRA_LISTAR", "COMPRA_REGISTRAR", "ESTOQUE_AJUSTAR", "ESTOQUE_LISTAR", "PRODUTO_GERENCIAR", "PRODUTO_LISTAR");
+        assertPermissoesOfPerfil(adminToken, "Gerente",
+                "COMPRA_LISTAR", "COMPRA_REGISTRAR", "ESTOQUE_AJUSTAR", "ESTOQUE_LISTAR", "PRODUTO_GERENCIAR", "PRODUTO_LISTAR",
+                "RELATORIO_VISUALIZAR", "VENDA_CANCELAR", "VENDA_LISTAR", "VENDA_REGISTRAR");
+    }
+
+    @Test
+    void shouldNotAllowGerenteToManageUsuarios() throws Exception {
+        final String adminToken = loginAccessToken(ADMIN_EMAIL, ADMIN_SENHA);
+        final String email = newEmail();
+        saveUsuario(adminToken, email, findPerfilIdByNome(adminToken, "Gerente"));
+        final String gerenteToken = loginAccessToken(email, SENHA_PADRAO);
+
+        mockMvc.perform(get("/api/v1/core/usuarios").header(HttpHeaders.AUTHORIZATION, bearer(gerenteToken)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/core/perfis").header(HttpHeaders.AUTHORIZATION, bearer(gerenteToken)))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -73,12 +101,22 @@ class CoreAcessoIT {
         mockMvc.perform(get("/api/v1/core/usuarios").header(HttpHeaders.AUTHORIZATION, bearer(caixaToken)))
                 .andExpect(status().isForbidden());
 
+        final String perfilJson = mockMvc.perform(post("/api/v1/core/perfis/perfil")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nome": "Consulta de usuários %s", "permissoes": ["USUARIO_LISTAR"]}
+                                """.formatted(UUID.randomUUID())))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        final Long perfilConsultaId = ((Number) JsonPath.read(perfilJson, "$.id")).longValue();
+
         mockMvc.perform(put("/api/v1/core/usuarios/usuario/{id}", usuarioId)
                         .header(HttpHeaders.AUTHORIZATION, bearer(adminToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"nome": "Operador", "email": "%s", "perfilIds": [%d]}
-                                """.formatted(email, findPerfilIdByNome(adminToken, "Gerente"))))
+                                """.formatted(email, perfilConsultaId)))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/api/v1/core/usuarios").header(HttpHeaders.AUTHORIZATION, bearer(caixaToken)))
@@ -125,7 +163,7 @@ class CoreAcessoIT {
     }
 
     @Test
-    void shouldNotAllowRemovingTheLastAdministrador() throws Exception {
+    void shouldNotAllowRemovingTheLastSuperadmin() throws Exception {
         final String adminToken = loginAccessToken(ADMIN_EMAIL, ADMIN_SENHA);
         final String meJson = mockMvc.perform(get("/api/v1/core/usuarios/me").header(HttpHeaders.AUTHORIZATION, bearer(adminToken)))
                 .andReturn().getResponse().getContentAsString();
@@ -135,7 +173,7 @@ class CoreAcessoIT {
                         .header(HttpHeaders.AUTHORIZATION, bearer(adminToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome": "Administrador", "email": "%s", "perfilIds": [%d]}
+                                {"nome": "Superadmin", "email": "%s", "perfilIds": [%d]}
                                 """.formatted(ADMIN_EMAIL, findPerfilIdByNome(adminToken, "Caixa"))))
                 .andExpect(status().isUnprocessableContent());
 
@@ -150,7 +188,7 @@ class CoreAcessoIT {
     void shouldRejectEditingPerfilDoSistema() throws Exception {
         final String adminToken = loginAccessToken(ADMIN_EMAIL, ADMIN_SENHA);
 
-        mockMvc.perform(put("/api/v1/core/perfis/perfil/{id}/status", findPerfilIdByNome(adminToken, "Administrador"))
+        mockMvc.perform(put("/api/v1/core/perfis/perfil/{id}/status", findPerfilIdByNome(adminToken, "Superadmin"))
                         .header(HttpHeaders.AUTHORIZATION, bearer(adminToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"ativo\": false}"))
@@ -167,6 +205,13 @@ class CoreAcessoIT {
 
     private String loginAccessToken(final String email, final String senha) throws Exception {
         return JsonPath.read(login(email, senha), "$.accessToken");
+    }
+
+    private void assertPermissoesOfPerfil(final String accessToken, final String nome, final String... permissoes) throws Exception {
+        mockMvc.perform(get("/api/v1/core/perfis/perfil/{id}", findPerfilIdByNome(accessToken, nome))
+                        .header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.permissoes", Matchers.containsInAnyOrder(permissoes)));
     }
 
     private Long findPerfilIdByNome(final String accessToken, final String nome) throws Exception {

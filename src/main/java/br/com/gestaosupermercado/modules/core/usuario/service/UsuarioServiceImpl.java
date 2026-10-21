@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Gestão de usuários e da própria conta.
  * <p>
  * Invariante protegida aqui: o sistema nunca fica sem ao menos um usuário ativo com o perfil do sistema
- * (Administrador). Inativar ou trocar os perfis do último Administrador é recusado.
+ * (Superadmin). Inativar ou trocar os perfis do último Superadmin é recusado.
  *
  * @since 0.0.1
  */
@@ -46,6 +46,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final PerfilService perfilService;
+    private final PermissaoEfetivaService permissaoEfetivaService;
     private final SessaoService sessaoService;
     private final PasswordEncoder passwordEncoder;
     private final Clock clock;
@@ -85,8 +86,8 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw BusinessException.conflict(MensagemErro.EMAIL_JA_CADASTRADO);
         }
         final Set<Perfil> perfis = perfilService.findPerfisAtivosForVinculo(request.perfilIds());
-        if (isAdministradorAtivo(usuario) && perfis.stream().noneMatch(Perfil::isSistema)) {
-            ensureOutroAdministradorAtivo(id);
+        if (isSuperadminAtivo(usuario) && perfis.stream().noneMatch(Perfil::isSistema)) {
+            ensureOutroSuperadminAtivo(id);
         }
         usuario.setNome(request.nome().strip());
         usuario.setEmail(email);
@@ -101,8 +102,8 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw BusinessException.unprocessable(MensagemErro.USUARIO_NAO_PODE_ALTERAR_PROPRIO_STATUS);
         }
         final Usuario usuario = findUsuarioEntityById(id);
-        if (!ativo && isAdministradorAtivo(usuario)) {
-            ensureOutroAdministradorAtivo(id);
+        if (!ativo && isSuperadminAtivo(usuario)) {
+            ensureOutroSuperadminAtivo(id);
         }
         usuario.setAtivo(ativo);
         if (!ativo) {
@@ -123,7 +124,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioLogadoResponse findUsuarioLogado(final Long usuarioLogadoId) {
         final Usuario usuario = findUsuarioEntityById(usuarioLogadoId);
         return new UsuarioLogadoResponse(usuario.getId(), usuario.getNome(), usuario.getEmail(), toPerfilResumoResponses(usuario),
-                usuarioRepository.findPermissoesEfetivasByUsuarioId(usuarioLogadoId).stream().sorted().toList());
+                permissaoEfetivaService.findPermissoesEfetivasByUsuarioId(usuarioLogadoId).stream().sorted().toList());
     }
 
     /**
@@ -148,13 +149,13 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> BusinessException.notFound(MensagemErro.USUARIO_NAO_ENCONTRADO));
     }
 
-    private static boolean isAdministradorAtivo(final Usuario usuario) {
+    private static boolean isSuperadminAtivo(final Usuario usuario) {
         return usuario.isAtivo() && usuario.getPerfis().stream().anyMatch(perfil -> perfil.isSistema() && perfil.isAtivo());
     }
 
-    private void ensureOutroAdministradorAtivo(final Long usuarioId) {
-        if (usuarioRepository.countAdministradoresAtivosExcept(usuarioId) == 0) {
-            throw BusinessException.unprocessable(MensagemErro.ULTIMO_ADMINISTRADOR);
+    private void ensureOutroSuperadminAtivo(final Long usuarioId) {
+        if (usuarioRepository.countSuperadminsAtivosExcept(usuarioId) == 0) {
+            throw BusinessException.unprocessable(MensagemErro.ULTIMO_SUPERADMIN);
         }
     }
 

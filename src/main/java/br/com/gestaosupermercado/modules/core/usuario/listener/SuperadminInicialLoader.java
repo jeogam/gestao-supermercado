@@ -18,10 +18,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Cria o primeiro Administrador a partir de variáveis de ambiente ({@code ADMIN_EMAIL}, {@code ADMIN_SENHA})
+ * Cria o primeiro Superadmin a partir de variáveis de ambiente ({@code ADMIN_EMAIL}, {@code ADMIN_SENHA})
  * quando o banco ainda não tem nenhum usuário. A senha nunca fica no código nem em migration.
  * <p>
- * Isto NÃO recria nem altera o administrador depois que existe qualquer usuário: com o banco populado,
+ * Isto NÃO recria nem altera o Superadmin depois que existe qualquer usuário: com o banco populado,
  * as variáveis são ignoradas e podem ser removidas do ambiente.
  *
  * @since 0.0.1
@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AdministradorInicialLoader implements ApplicationRunner {
+public class SuperadminInicialLoader implements ApplicationRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final PerfilRepository perfilRepository;
@@ -52,13 +52,13 @@ public class AdministradorInicialLoader implements ApplicationRunner {
             return;
         }
         if (email == null || email.isBlank() || senha == null || senha.isBlank()) {
-            log.warn("Nenhum usuário cadastrado. Defina ADMIN_EMAIL e ADMIN_SENHA para criar o Administrador inicial.");
+            log.warn("Nenhum usuário cadastrado. Defina ADMIN_EMAIL e ADMIN_SENHA para criar o Superadmin inicial.");
             return;
         }
         final Perfil administrador = perfilRepository.findFirstBySistemaTrue()
-                .orElseThrow(() -> new IllegalStateException("Perfil do sistema (Administrador) não encontrado; verifique as migrations."));
+                .orElseThrow(() -> new IllegalStateException("Perfil do sistema (Superadmin) não encontrado; verifique as migrations."));
         usuarioRepository.save(new Usuario(nome, email.strip().toLowerCase(Locale.ROOT), passwordEncoder.encode(senha),
                 Set.of(administrador), OffsetDateTime.now(clock)));
-        log.info("Administrador inicial criado.");
+        log.info("Superadmin inicial criado.");
     }
 }

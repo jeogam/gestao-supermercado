@@ -26,7 +26,7 @@ As migrations do Flyway criam as tabelas na primeira subida da API.
 3. Preencha as variáveis pedidas:
    - `DB_URL`: a URL JDBC do passo anterior
    - `DB_USERNAME` / `DB_PASSWORD`: do Neon
-   - `ADMIN_EMAIL` / `ADMIN_SENHA`: o primeiro Administrador (só é usado enquanto não houver usuário)
+   - `ADMIN_EMAIL` / `ADMIN_SENHA`: o primeiro Superadmin (só é usado enquanto não houver usuário)
    - `JWT_SECRET` é gerado pelo Render automaticamente
 4. Aguarde o deploy e teste: `https://<seu-app>.onrender.com/actuator/health/liveness` deve responder `{"status":"UP"}`.
 

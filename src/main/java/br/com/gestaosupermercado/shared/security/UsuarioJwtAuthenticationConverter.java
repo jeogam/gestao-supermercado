@@ -2,6 +2,7 @@ package br.com.gestaosupermercado.shared.security;
 
 import br.com.gestaosupermercado.modules.core.usuario.model.Usuario;
 import br.com.gestaosupermercado.modules.core.usuario.repository.UsuarioRepository;
+import br.com.gestaosupermercado.modules.core.usuario.service.PermissaoEfetivaService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
 public class UsuarioJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private final UsuarioRepository usuarioRepository;
+    private final PermissaoEfetivaService permissaoEfetivaService;
 
     @Override
     public AbstractAuthenticationToken convert(final Jwt jwt) {
@@ -40,7 +42,7 @@ public class UsuarioJwtAuthenticationConverter implements Converter<Jwt, Abstrac
             throw new InvalidBearerTokenException("Token emitido antes da última troca de senha");
         }
 
-        final List<SimpleGrantedAuthority> authorities = usuarioRepository.findPermissoesEfetivasByUsuarioId(usuarioId).stream()
+        final List<SimpleGrantedAuthority> authorities = permissaoEfetivaService.findPermissoesEfetivasByUsuarioId(usuarioId).stream()
                 .map(permissao -> new SimpleGrantedAuthority(permissao.name()))
                 .toList();
         return new JwtAuthenticationToken(jwt, authorities, usuarioId.toString());

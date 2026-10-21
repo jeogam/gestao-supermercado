@@ -21,7 +21,7 @@ public enum MensagemErro {
     USUARIO_NAO_ENCONTRADO("Usuário não encontrado."),
     EMAIL_JA_CADASTRADO("Já existe um usuário cadastrado com este e-mail."),
     USUARIO_NAO_PODE_ALTERAR_PROPRIO_STATUS("Você não pode ativar ou inativar o seu próprio usuário."),
-    ULTIMO_ADMINISTRADOR("A operação deixaria o sistema sem nenhum Administrador ativo."),
+    ULTIMO_SUPERADMIN("A operação deixaria o sistema sem nenhum Superadmin ativo."),
 
     PERFIL_NAO_ENCONTRADO("Perfil não encontrado."),
     PERFIL_INATIVO("Não é possível vincular um perfil inativo."),

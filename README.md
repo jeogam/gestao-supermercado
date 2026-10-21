@@ -30,13 +30,23 @@ Regras de segurança já implementadas:
 - Mensagem de erro de login genérica (não revela se o e-mail existe).
 - Access token curto (15 min) + refresh token opaco de uso único; reutilizar um refresh já usado revoga todas as
   sessões do usuário. No banco fica só o hash SHA-256 do refresh token.
-- O perfil **Administrador** é do sistema: não pode ser editado nem inativado, e o sistema recusa qualquer operação
-  que o deixe sem nenhum Administrador ativo.
+- O perfil **Superadmin** é do sistema: não pode ser editado nem inativado, e o sistema recusa qualquer operação
+  que o deixe sem nenhum Superadmin ativo.
+
+### Perfis
+
+| Perfil | Pode fazer |
+|--------|------------|
+| **Caixa** | Somente vendas: registrar, consultar e cancelar vendas (consulta produtos para vender, sem alterá-los) |
+| **Estoquista** | Somente estoque: produtos, estoque e compras de fornecedores |
+| **Gerente** | Tudo do Caixa e do Estoquista, mais relatórios (faturamento, margem, PDF). Não gere usuários nem perfis |
+| **Superadmin** | Tudo do sistema, inclusive usuários e perfis. Recebe toda permissão nova automaticamente, pelo código |
 
 ## Como adicionar uma permissão nova
 
 1. Adicione a constante no enum `Permissao`.
-2. Crie uma migration que insere a permissão no catálogo (`ON CONFLICT DO NOTHING`) e a concede ao perfil Administrador.
+2. Crie uma migration que insere a permissão no catálogo (`ON CONFLICT DO NOTHING`) e a concede aos perfis que
+   devem tê-la (Caixa, Estoquista e/ou Gerente). O Superadmin já recebe todas pelo código.
 3. Use no endpoint com `@PreAuthorize("hasAuthority('NOVA_PERMISSAO')")`.
 
 A aplicação não sobe se o enum e a tabela `permissao` estiverem diferentes (`PermissaoCatalogoValidator`).
@@ -49,7 +59,7 @@ Pré-requisitos: JDK 21+ e Docker.
 2. Suba o banco: `docker compose up -d db`
 3. Rode a API: `./mvnw spring-boot:run`
 
-Na primeira subida, com o banco vazio, o Administrador é criado com `ADMIN_EMAIL`/`ADMIN_SENHA`.
+Na primeira subida, com o banco vazio, o Superadmin é criado com `ADMIN_EMAIL`/`ADMIN_SENHA`.
 Documentação da API: http://localhost:8080/swagger-ui.html (ou a porta definida em `SERVER_PORT`)
 
 Para subir banco e API juntos em containers (como em um servidor): `docker compose up -d --build`.

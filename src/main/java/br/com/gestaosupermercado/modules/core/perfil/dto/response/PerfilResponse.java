@@ -21,7 +21,7 @@ public record PerfilResponse(
         @Schema(description = "Perfil do sistema: não pode ser editado nem inativado", example = "false")
         boolean sistema,
 
-        @Schema(description = "Permissões concedidas, em ordem alfabética")
+        @Schema(description = "Permissões concedidas, agrupadas por área do sistema")
         List<Permissao> permissoes
 ) {
 }

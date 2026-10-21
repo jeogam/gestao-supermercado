@@ -83,7 +83,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuário atualizado"),
             @ApiResponse(responseCode = "404", description = "Usuário ou perfil não encontrado"),
             @ApiResponse(responseCode = "409", description = "E-mail já cadastrado"),
-            @ApiResponse(responseCode = "422", description = "Dados inválidos, perfil inativo ou remoção do último Administrador")
+            @ApiResponse(responseCode = "422", description = "Dados inválidos, perfil inativo ou remoção do último Superadmin")
     })
     @PutMapping("/usuario/{id}")
     @PreAuthorize("hasAuthority('USUARIO_EDITAR')")
@@ -95,7 +95,7 @@ public class UsuarioController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Status alterado"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
-            @ApiResponse(responseCode = "422", description = "Próprio usuário ou último Administrador")
+            @ApiResponse(responseCode = "422", description = "Próprio usuário ou último Superadmin")
     })
     @PutMapping("/usuario/{id}/status")
     @PreAuthorize("hasAuthority('USUARIO_ALTERAR_STATUS')")
