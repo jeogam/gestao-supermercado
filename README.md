@@ -42,6 +42,8 @@ Regras de segurança já implementadas:
 | **Gerente** | Tudo do Caixa e do Estoquista, mais relatórios (faturamento, margem, PDF). Não gere usuários nem perfis |
 | **Superadmin** | Tudo do sistema, inclusive usuários e perfis. Recebe toda permissão nova automaticamente, pelo código |
 
+Os motivos dessa divisão estão em [ADR-001](docs/adr/ADR-001-perfis-e-permissoes.md).
+
 ## Como adicionar uma permissão nova
 
 1. Adicione a constante no enum `Permissao`.
