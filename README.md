@@ -1,2 +1,61 @@
-# gestao supermercado
-Inicio do projeto de gestão de mercado
+# Gestão Supermercado
+
+Backend da gestão de supermercado. Spring Boot 4, Java 21, PostgreSQL, Flyway e JWT.
+
+## Módulos
+
+O código é organizado por módulo de negócio em `src/main/java/br/com/gestaosupermercado/modules/<modulo>/<subdominio>/`,
+cada subdomínio com `controller`, `service` (interface + `Impl`), `repository`, `model`, `dto/request`, `dto/response`
+e, quando preciso, `enums` e `listener`. O que é transversal fica em `shared/`.
+
+### Core (`modules/core`)
+
+Identidade e controle de acesso:
+
+| Subdomínio  | Responsabilidade |
+|-------------|------------------|
+| `auth`      | Login, renovação (refresh token rotativo) e logout |
+| `usuario`   | Cadastro de usuários, troca/redefinição de senha, `/me` |
+| `perfil`    | Perfis de acesso (cargos: Gerente, Caixa, Estoquista...) e suas permissões |
+| `permissao` | Catálogo de permissões |
+
+**Modelo de acesso (RBAC dinâmico):** usuário → N perfis → N permissões. As permissões **não** vão dentro do JWT; são
+lidas do banco a cada requisição. Por isso mudar o perfil de alguém, inativar um perfil ou inativar o usuário vale na
+hora, sem esperar o token expirar. Trocar a senha invalida todos os tokens emitidos antes.
+
+Regras de segurança já implementadas:
+
+- Senha com BCrypt; política única (`@SenhaForte`): 8 a 72 caracteres, com letra e número.
+- Bloqueio temporário após tentativas falhas (`app.security.login`).
+- Mensagem de erro de login genérica (não revela se o e-mail existe).
+- Access token curto (15 min) + refresh token opaco de uso único; reutilizar um refresh já usado revoga todas as
+  sessões do usuário. No banco fica só o hash SHA-256 do refresh token.
+- O perfil **Administrador** é do sistema: não pode ser editado nem inativado, e o sistema recusa qualquer operação
+  que o deixe sem nenhum Administrador ativo.
+
+## Como adicionar uma permissão nova
+
+1. Adicione a constante no enum `Permissao`.
+2. Crie uma migration que insere a permissão no catálogo (`ON CONFLICT DO NOTHING`) e a concede ao perfil Administrador.
+3. Use no endpoint com `@PreAuthorize("hasAuthority('NOVA_PERMISSAO')")`.
+
+A aplicação não sobe se o enum e a tabela `permissao` estiverem diferentes (`PermissaoCatalogoValidator`).
+
+## Rodando localmente
+
+Pré-requisitos: JDK 21+ e Docker.
+
+1. Copie `.env.example` para `.env` e preencha `DB_PASSWORD`, `JWT_SECRET`, `ADMIN_EMAIL` e `ADMIN_SENHA`.
+2. Suba o banco: `docker compose up -d db`
+3. Rode a API: `./mvnw spring-boot:run`
+
+Na primeira subida, com o banco vazio, o Administrador é criado com `ADMIN_EMAIL`/`ADMIN_SENHA`.
+Documentação da API: http://localhost:8080/swagger-ui.html
+
+## Testes
+
+```bash
+./mvnw verify
+```
+
+Roda os testes unitários e os de integração (`*IT`), que sobem um PostgreSQL via Testcontainers (requer Docker).

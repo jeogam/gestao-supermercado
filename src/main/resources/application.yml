@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: gestao-supermercado-backend
+  config:
+    # Permite rodar localmente lendo o .env (mesmo arquivo usado pelo docker compose).
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/gestao_supermercado}
+    username: ${DB_USERNAME:gestao}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration
+
+app:
+  security:
+    jwt:
+      # Segredo HMAC (HS256) com no mínimo 32 bytes. Obrigatório: a aplicação não sobe sem ele.
+      secret: ${JWT_SECRET:}
+      issuer: gestao-supermercado
+      access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:15m}
+      refresh-token-ttl: ${JWT_REFRESH_TOKEN_TTL:7d}
+    login:
+      max-tentativas: 5
+      tempo-bloqueio: 15m
+  bootstrap:
+    # Cria o primeiro Administrador somente quando ainda não existe nenhum usuário.
+    admin:
+      nome: ${ADMIN_NOME:Administrador}
+      email: ${ADMIN_EMAIL:}
+      senha: ${ADMIN_SENHA:}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
