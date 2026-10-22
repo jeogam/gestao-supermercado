@@ -14,24 +14,24 @@ public class BusinessException extends RuntimeException {
 
     private final HttpStatus status;
 
-    public BusinessException(final MensagemErro mensagemErro, final HttpStatus status) {
+    public BusinessException(final ErrorMessage mensagemErro, final HttpStatus status) {
         super(mensagemErro.getDescricao());
         this.status = status;
     }
 
-    public static BusinessException notFound(final MensagemErro mensagemErro) {
+    public static BusinessException notFound(final ErrorMessage mensagemErro) {
         return new BusinessException(mensagemErro, HttpStatus.NOT_FOUND);
     }
 
-    public static BusinessException conflict(final MensagemErro mensagemErro) {
+    public static BusinessException conflict(final ErrorMessage mensagemErro) {
         return new BusinessException(mensagemErro, HttpStatus.CONFLICT);
     }
 
-    public static BusinessException unprocessable(final MensagemErro mensagemErro) {
+    public static BusinessException unprocessable(final ErrorMessage mensagemErro) {
         return new BusinessException(mensagemErro, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
-    public static BusinessException unauthorized(final MensagemErro mensagemErro) {
+    public static BusinessException unauthorized(final ErrorMessage mensagemErro) {
         return new BusinessException(mensagemErro, HttpStatus.UNAUTHORIZED);
     }
 }

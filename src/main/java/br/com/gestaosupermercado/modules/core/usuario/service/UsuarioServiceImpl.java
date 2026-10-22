@@ -15,7 +15,7 @@ import br.com.gestaosupermercado.modules.core.usuario.repository.UsuarioReposito
 import br.com.gestaosupermercado.modules.core.usuario.repository.specs.UsuarioSpecs;
 import br.com.gestaosupermercado.shared.dto.PaginaResponse;
 import br.com.gestaosupermercado.shared.exception.BusinessException;
-import br.com.gestaosupermercado.shared.exception.MensagemErro;
+import br.com.gestaosupermercado.shared.exception.ErrorMessage;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -69,7 +69,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponse saveUsuario(final UsuarioCreateRequest request) {
         final String email = normalizeEmail(request.email());
         if (usuarioRepository.existsByEmail(email)) {
-            throw BusinessException.conflict(MensagemErro.EMAIL_JA_CADASTRADO);
+            throw BusinessException.conflict(ErrorMessage.EMAIL_JA_CADASTRADO);
         }
         final Set<Perfil> perfis = perfilService.findPerfisAtivosForVinculo(request.perfilIds());
         final Usuario usuario = new Usuario(request.nome().strip(), email, passwordEncoder.encode(request.senha()), perfis,
@@ -83,7 +83,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         final Usuario usuario = findUsuarioEntityById(id);
         final String email = normalizeEmail(request.email());
         if (usuarioRepository.existsByEmailAndIdNot(email, id)) {
-            throw BusinessException.conflict(MensagemErro.EMAIL_JA_CADASTRADO);
+            throw BusinessException.conflict(ErrorMessage.EMAIL_JA_CADASTRADO);
         }
         final Set<Perfil> perfis = perfilService.findPerfisAtivosForVinculo(request.perfilIds());
         if (isSuperadminAtivo(usuario) && perfis.stream().noneMatch(Perfil::isSistema)) {
@@ -99,7 +99,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional
     public void updateStatusUsuario(final Long id, final boolean ativo, final Long usuarioLogadoId) {
         if (id.equals(usuarioLogadoId)) {
-            throw BusinessException.unprocessable(MensagemErro.USUARIO_NAO_PODE_ALTERAR_PROPRIO_STATUS);
+            throw BusinessException.unprocessable(ErrorMessage.USUARIO_NAO_PODE_ALTERAR_PROPRIO_STATUS);
         }
         final Usuario usuario = findUsuarioEntityById(id);
         if (!ativo && isSuperadminAtivo(usuario)) {
@@ -135,10 +135,10 @@ public class UsuarioServiceImpl implements UsuarioService {
     public void updateSenhaUsuarioLogado(final Long usuarioLogadoId, final SenhaAlteracaoRequest request) {
         final Usuario usuario = findUsuarioEntityById(usuarioLogadoId);
         if (!passwordEncoder.matches(request.senhaAtual(), usuario.getSenhaHash())) {
-            throw BusinessException.unprocessable(MensagemErro.SENHA_ATUAL_INCORRETA);
+            throw BusinessException.unprocessable(ErrorMessage.SENHA_ATUAL_INCORRETA);
         }
         if (passwordEncoder.matches(request.novaSenha(), usuario.getSenhaHash())) {
-            throw BusinessException.unprocessable(MensagemErro.NOVA_SENHA_IGUAL_ATUAL);
+            throw BusinessException.unprocessable(ErrorMessage.NOVA_SENHA_IGUAL_ATUAL);
         }
         usuario.updateSenha(passwordEncoder.encode(request.novaSenha()), OffsetDateTime.now(clock));
         sessaoService.revokeAllSessoes(usuarioLogadoId);
@@ -146,7 +146,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private Usuario findUsuarioEntityById(final Long id) {
         return usuarioRepository.findWithPerfisById(id)
-                .orElseThrow(() -> BusinessException.notFound(MensagemErro.USUARIO_NAO_ENCONTRADO));
+                .orElseThrow(() -> BusinessException.notFound(ErrorMessage.USUARIO_NAO_ENCONTRADO));
     }
 
     private static boolean isSuperadminAtivo(final Usuario usuario) {
@@ -155,7 +155,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private void ensureOutroSuperadminAtivo(final Long usuarioId) {
         if (usuarioRepository.countSuperadminsAtivosExcept(usuarioId) == 0) {
-            throw BusinessException.unprocessable(MensagemErro.ULTIMO_SUPERADMIN);
+            throw BusinessException.unprocessable(ErrorMessage.ULTIMO_SUPERADMIN);
         }
     }
 

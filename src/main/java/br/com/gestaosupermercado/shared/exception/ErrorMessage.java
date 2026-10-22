@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public enum MensagemErro {
+public enum ErrorMessage {
 
     CREDENCIAIS_INVALIDAS("E-mail ou senha inválidos."),
     REFRESH_TOKEN_INVALIDO("Sessão expirada ou inválida. Faça login novamente."),
@@ -26,7 +26,14 @@ public enum MensagemErro {
     PERFIL_NAO_ENCONTRADO("Perfil não encontrado."),
     PERFIL_INATIVO("Não é possível vincular um perfil inativo."),
     PERFIL_JA_CADASTRADO("Já existe um perfil cadastrado com este nome."),
-    PERFIL_DO_SISTEMA_NAO_EDITAVEL("Perfis do sistema não podem ser alterados.");
+    PERFIL_DO_SISTEMA_NAO_EDITAVEL("Perfis do sistema não podem ser alterados."),
+
+    PRODUTO_NAO_ENCONTRADO("Produto não encontrado."),
+    PRODUTO_INATIVO("O produto está inativo."),
+    CODIGO_BARRAS_JA_CADASTRADO("Já existe um produto cadastrado com este código de barras."),
+    QUANTIDADE_INVALIDA("Quantidade inválida: deve ser maior que zero, ter no máximo 3 casas decimais e ser inteira para produtos vendidos por unidade."),
+    UNIDADE_INCOMPATIVEL_COM_ESTOQUE("Não é possível vender por unidade um produto com estoque fracionado. Ajuste o estoque antes."),
+    ESTOQUE_INSUFICIENTE("Estoque insuficiente para a operação.");
 
     private final String descricao;
 }

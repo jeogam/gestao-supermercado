@@ -33,6 +33,21 @@ Regras de segurança já implementadas:
 - O perfil **Superadmin** é do sistema: não pode ser editado nem inativado, e o sistema recusa qualquer operação
   que o deixe sem nenhum Superadmin ativo.
 
+### Produto (`modules/produto`)
+
+Cadastro de produtos (`/api/v1/produto/produtos`), base de Estoque, Vendas, Compras e Relatórios. Consulta exige
+`PRODUTO_LISTAR`; cadastro, edição e inativação exigem `PRODUTO_GERENCIAR`. Produto não é excluído, só inativado,
+para não quebrar vendas e relatórios antigos.
+
+Para os outros módulos:
+
+- Obtenha o produto com `ProdutoService.findProdutoAtivoForMovimentacao(id)` dentro da sua transação.
+- Mova o estoque só por `Produto.addEstoque` / `Produto.removeEstoque`: recusam quantidade zero/negativa, quantidade
+  fracionada em produto vendido por unidade (`UN`) e saída maior que o disponível.
+- Movimentações concorrentes do mesmo produto falham com 409 (lock otimista) em vez de se sobrescreverem.
+- Relatórios de margem usam `precoCusto` e `precoVenda`. Na API de produtos, `precoCusto` só aparece para quem tem
+  `PRODUTO_GERENCIAR` (o Caixa recebe `null`).
+
 ### Perfis
 
 | Perfil | Pode fazer |

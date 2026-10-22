@@ -13,7 +13,7 @@ import br.com.gestaosupermercado.modules.core.auth.dto.response.TokenResponse;
 import br.com.gestaosupermercado.modules.core.usuario.model.Usuario;
 import br.com.gestaosupermercado.modules.core.usuario.repository.UsuarioRepository;
 import br.com.gestaosupermercado.shared.exception.BusinessException;
-import br.com.gestaosupermercado.shared.exception.MensagemErro;
+import br.com.gestaosupermercado.shared.exception.ErrorMessage;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -71,7 +71,7 @@ class AuthServiceImplTest {
 
         assertThatThrownBy(() -> authService.login(new LoginRequest("ninguem@mercado.com", "Senha123")))
                 .isInstanceOf(BusinessException.class)
-                .hasMessage(MensagemErro.CREDENCIAIS_INVALIDAS.getDescricao());
+                .hasMessage(ErrorMessage.CREDENCIAIS_INVALIDAS.getDescricao());
         verify(passwordEncoder).matches("Senha123", "hashFicticio");
     }
 
@@ -88,7 +88,7 @@ class AuthServiceImplTest {
 
         assertThat(usuario.isBloqueado(OffsetDateTime.now(CLOCK))).isTrue();
         assertThatThrownBy(() -> authService.login(new LoginRequest("maria@mercado.com", "Senha123")))
-                .hasMessage(MensagemErro.CREDENCIAIS_INVALIDAS.getDescricao());
+                .hasMessage(ErrorMessage.CREDENCIAIS_INVALIDAS.getDescricao());
         verify(sessaoService, never()).createSessao(any());
     }
 
@@ -99,7 +99,7 @@ class AuthServiceImplTest {
         when(usuarioRepository.findByEmail("maria@mercado.com")).thenReturn(Optional.of(usuario));
 
         assertThatThrownBy(() -> authService.login(new LoginRequest("maria@mercado.com", "Senha123")))
-                .hasMessage(MensagemErro.CREDENCIAIS_INVALIDAS.getDescricao());
+                .hasMessage(ErrorMessage.CREDENCIAIS_INVALIDAS.getDescricao());
         verify(sessaoService, never()).createSessao(any());
     }
 

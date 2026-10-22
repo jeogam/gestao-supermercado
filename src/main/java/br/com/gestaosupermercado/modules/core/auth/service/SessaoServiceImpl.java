@@ -6,7 +6,7 @@ import br.com.gestaosupermercado.modules.core.auth.model.RefreshToken;
 import br.com.gestaosupermercado.modules.core.auth.repository.RefreshTokenRepository;
 import br.com.gestaosupermercado.modules.core.usuario.model.Usuario;
 import br.com.gestaosupermercado.shared.exception.BusinessException;
-import br.com.gestaosupermercado.shared.exception.MensagemErro;
+import br.com.gestaosupermercado.shared.exception.ErrorMessage;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -62,16 +62,16 @@ public class SessaoServiceImpl implements SessaoService {
     public TokenResponse rotateSessao(final String refreshToken) {
         final OffsetDateTime agora = OffsetDateTime.now(clock);
         final RefreshToken atual = refreshTokenRepository.findByTokenHash(hashToken(refreshToken))
-                .orElseThrow(() -> BusinessException.unauthorized(MensagemErro.REFRESH_TOKEN_INVALIDO));
+                .orElseThrow(() -> BusinessException.unauthorized(ErrorMessage.REFRESH_TOKEN_INVALIDO));
         final Usuario usuario = atual.getUsuario();
 
         if (atual.isRevogado()) {
             refreshTokenRepository.revokeAllByUsuarioId(usuario.getId(), agora);
-            throw BusinessException.unauthorized(MensagemErro.REFRESH_TOKEN_INVALIDO);
+            throw BusinessException.unauthorized(ErrorMessage.REFRESH_TOKEN_INVALIDO);
         }
         if (atual.isExpirado(agora) || !usuario.isAtivo()) {
             atual.revoke(agora);
-            throw BusinessException.unauthorized(MensagemErro.REFRESH_TOKEN_INVALIDO);
+            throw BusinessException.unauthorized(ErrorMessage.REFRESH_TOKEN_INVALIDO);
         }
         atual.revoke(agora);
         return createSessao(usuario);

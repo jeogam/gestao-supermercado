@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -55,6 +56,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErroResponse> handleNoResourceFoundException(final NoResourceFoundException exception) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErroResponse.of(HttpStatus.NOT_FOUND.value(), "Recurso não encontrado."));
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ErroResponse> handleOptimisticLockingException(final ObjectOptimisticLockingFailureException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErroResponse.of(HttpStatus.CONFLICT.value(), "O registro foi alterado por outra operação. Tente novamente."));
     }
 
     @ExceptionHandler(Exception.class)

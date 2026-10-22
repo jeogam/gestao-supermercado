@@ -6,7 +6,7 @@ import br.com.gestaosupermercado.modules.core.auth.dto.response.TokenResponse;
 import br.com.gestaosupermercado.modules.core.usuario.model.Usuario;
 import br.com.gestaosupermercado.modules.core.usuario.repository.UsuarioRepository;
 import br.com.gestaosupermercado.shared.exception.BusinessException;
-import br.com.gestaosupermercado.shared.exception.MensagemErro;
+import br.com.gestaosupermercado.shared.exception.ErrorMessage;
 import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.Locale;
@@ -56,16 +56,16 @@ public class AuthServiceImpl implements AuthService {
 
         if (usuarioEncontrado.isEmpty()) {
             passwordEncoder.matches(request.senha(), senhaHashFicticia);
-            throw BusinessException.unauthorized(MensagemErro.CREDENCIAIS_INVALIDAS);
+            throw BusinessException.unauthorized(ErrorMessage.CREDENCIAIS_INVALIDAS);
         }
 
         final Usuario usuario = usuarioEncontrado.get();
         if (!usuario.isAtivo() || usuario.isBloqueado(agora)) {
-            throw BusinessException.unauthorized(MensagemErro.CREDENCIAIS_INVALIDAS);
+            throw BusinessException.unauthorized(ErrorMessage.CREDENCIAIS_INVALIDAS);
         }
         if (!passwordEncoder.matches(request.senha(), usuario.getSenhaHash())) {
             usuario.registerFalhaLogin(loginProperties.maxTentativas(), loginProperties.tempoBloqueio(), agora);
-            throw BusinessException.unauthorized(MensagemErro.CREDENCIAIS_INVALIDAS);
+            throw BusinessException.unauthorized(ErrorMessage.CREDENCIAIS_INVALIDAS);
         }
 
         usuario.registerLoginSucesso(agora);
