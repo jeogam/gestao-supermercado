@@ -9,7 +9,10 @@ import br.com.gestaosupermercado.modules.produto.produto.repository.specs.Produt
 import br.com.gestaosupermercado.shared.dto.PaginaResponse;
 import br.com.gestaosupermercado.shared.exception.BusinessException;
 import br.com.gestaosupermercado.shared.exception.ErrorMessage;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -94,6 +97,16 @@ public class ProdutoServiceImpl implements ProdutoService {
             throw BusinessException.unprocessable(ErrorMessage.PRODUTO_INATIVO);
         }
         return produto;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, String> findNomesProdutosByIds(final Collection<Long> ids) {
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        return produtoRepository.findAllById(ids).stream()
+                .collect(Collectors.toMap(Produto::getId, Produto::getNome));
     }
 
     private Produto findProdutoEntityById(final Long id) {

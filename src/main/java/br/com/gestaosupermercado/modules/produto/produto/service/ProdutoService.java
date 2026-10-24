@@ -5,6 +5,8 @@ import br.com.gestaosupermercado.modules.produto.produto.dto.request.ProdutoRequ
 import br.com.gestaosupermercado.modules.produto.produto.dto.response.ProdutoResponse;
 import br.com.gestaosupermercado.modules.produto.produto.model.Produto;
 import br.com.gestaosupermercado.shared.dto.PaginaResponse;
+import java.util.Collection;
+import java.util.Map;
 import org.springframework.data.domain.Pageable;
 
 public interface ProdutoService {
@@ -25,4 +27,10 @@ public interface ProdutoService {
      * Falha se o produto não existir ou estiver inativo, ou se for chamado fora de uma transação.
      */
     Produto findProdutoAtivoForMovimentacao(Long id);
+
+    /**
+     * Nome de cada produto por id, para as listagens de outros módulos que guardam só o id do produto.
+     * Ids inexistentes ficam fora do mapa.
+     */
+    Map<Long, String> findNomesProdutosByIds(Collection<Long> ids);
 }
