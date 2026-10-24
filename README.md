@@ -48,6 +48,21 @@ Para os outros módulos:
 - Relatórios de margem usam `precoCusto` e `precoVenda`. Na API de produtos, `precoCusto` só aparece para quem tem
   `PRODUTO_GERENCIAR` (o Caixa recebe `null`).
 
+### Estoque (`modules/estoque`)
+
+| Subdomínio     | Responsabilidade |
+|----------------|------------------|
+| `movimentacao` | Ajuste manual (`POST /api/v1/estoque/movimentacoes/ajuste`) e histórico de entradas e saídas (`GET /api/v1/estoque/movimentacoes`) |
+| `reposicao`    | Alerta de reposição: produtos ativos abaixo do estoque mínimo e quanto falta (`GET /api/v1/estoque/reposicao`) |
+
+Consulta exige `ESTOQUE_LISTAR`; ajuste exige `ESTOQUE_AJUSTAR` e um motivo (perda, avaria, inventário...).
+Cada movimentação guarda tipo (`ENTRADA`/`SAIDA`), origem (`AJUSTE`, `COMPRA`, `VENDA`, `ESTORNO_VENDA`), o saldo do
+produto logo depois dela e o usuário que a fez. O histórico é imutável: um erro se corrige com outro ajuste.
+
+Para Compras e Vendas, a regra acima fica assim: **não** chame `Produto.addEstoque`/`removeEstoque` direto; use
+`MovimentacaoEstoqueService.saveMovimentacao(produtoId, tipo, quantidade, origem, referenciaId, usuarioId)` dentro da
+transação da compra/venda, passando o id dela em `referenciaId`. Assim toda mudança de estoque fica no histórico.
+
 ### Perfis
 
 | Perfil | Pode fazer |
