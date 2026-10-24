@@ -33,7 +33,11 @@ public enum ErrorMessage {
     CODIGO_BARRAS_JA_CADASTRADO("Já existe um produto cadastrado com este código de barras."),
     QUANTIDADE_INVALIDA("Quantidade inválida: deve ser maior que zero, ter no máximo 3 casas decimais e ser inteira para produtos vendidos por unidade."),
     UNIDADE_INCOMPATIVEL_COM_ESTOQUE("Não é possível vender por unidade um produto com estoque fracionado. Ajuste o estoque antes."),
-    ESTOQUE_INSUFICIENTE("Estoque insuficiente para a operação.");
+    ESTOQUE_INSUFICIENTE("Estoque insuficiente para a operação."),
+
+    MOVIMENTACAO_NAO_ENCONTRADA("Movimentação de estoque não encontrada."),
+    MOTIVO_AJUSTE_OBRIGATORIO("Informe o motivo do ajuste de estoque."),
+    PERIODO_INVALIDO("A data inicial deve ser anterior ou igual à data final.");
 
     private final String descricao;
 }
