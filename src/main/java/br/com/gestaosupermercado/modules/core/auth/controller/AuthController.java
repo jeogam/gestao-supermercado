@@ -1,5 +1,6 @@
 package br.com.gestaosupermercado.modules.core.auth.controller;
 
+import br.com.gestaosupermercado.modules.core.auth.dto.request.CadastroRequest;
 import br.com.gestaosupermercado.modules.core.auth.dto.request.LoginRequest;
 import br.com.gestaosupermercado.modules.core.auth.dto.request.RefreshTokenRequest;
 import br.com.gestaosupermercado.modules.core.auth.dto.response.TokenResponse;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+
+    @Operation(summary = "Cria a própria conta, sem perfil; o acesso é liberado pelo Superadmin")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Conta criada"),
+            @ApiResponse(responseCode = "409", description = "E-mail já cadastrado"),
+            @ApiResponse(responseCode = "422", description = "Dados inválidos ou senha fora da política")
+    })
+    @PostMapping("/cadastro")
+    public ResponseEntity<Void> cadastrar(@RequestBody @Valid final CadastroRequest request) {
+        authService.cadastrar(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
     @Operation(summary = "Autentica com e-mail e senha e abre uma sessão")
     @ApiResponses({

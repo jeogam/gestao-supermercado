@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import br.com.gestaosupermercado.modules.core.auth.config.LoginProperties;
+import br.com.gestaosupermercado.modules.core.auth.dto.request.CadastroRequest;
 import br.com.gestaosupermercado.modules.core.auth.dto.request.LoginRequest;
 import br.com.gestaosupermercado.modules.core.auth.dto.response.TokenResponse;
 import br.com.gestaosupermercado.modules.core.usuario.model.Usuario;
@@ -24,8 +25,10 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
@@ -101,6 +104,41 @@ class AuthServiceImplTest {
         assertThatThrownBy(() -> authService.login(new LoginRequest("maria@mercado.com", "Senha123")))
                 .hasMessage(ErrorMessage.CREDENCIAIS_INVALIDAS.getDescricao());
         verify(sessaoService, never()).createSessao(any());
+    }
+
+    @Test
+    void shouldCadastrarUsuarioAtivoSemPerfilWithEmailNormalizado() {
+        when(passwordEncoder.encode("Mercado123")).thenReturn("hashNovo");
+        final ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
+
+        authService.cadastrar(new CadastroRequest("  Marcos Oliveira ", " Marcos@Mercado.com ", "Mercado123"));
+
+        verify(usuarioRepository).saveAndFlush(captor.capture());
+        final Usuario usuario = captor.getValue();
+        assertThat(usuario.getNome()).isEqualTo("Marcos Oliveira");
+        assertThat(usuario.getEmail()).isEqualTo("marcos@mercado.com");
+        assertThat(usuario.getSenhaHash()).isEqualTo("hashNovo");
+        assertThat(usuario.isAtivo()).isTrue();
+        assertThat(usuario.getPerfis()).isEmpty();
+    }
+
+    @Test
+    void shouldRejectCadastroWhenEmailJaExiste() {
+        when(usuarioRepository.existsByEmail("maria@mercado.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> authService.cadastrar(new CadastroRequest("Maria", "maria@mercado.com", "Mercado123")))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorMessage.EMAIL_JA_CADASTRADO.getDescricao());
+        verify(usuarioRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    void shouldTranslateUniqueViolationToConflictWhenCadastrosSimultaneos() {
+        when(usuarioRepository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException("uk_usuario_email"));
+
+        assertThatThrownBy(() -> authService.cadastrar(new CadastroRequest("Maria", "maria@mercado.com", "Mercado123")))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(ErrorMessage.EMAIL_JA_CADASTRADO.getDescricao());
     }
 
     private static Usuario newUsuario() {

@@ -28,7 +28,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * API stateless: autenticação por Bearer JWT e autorização por permissão via {@code @PreAuthorize}.
- * Tudo exige autenticação, exceto login/refresh/logout, a documentação e o health check.
+ * Tudo exige autenticação, exceto cadastro/login/refresh/logout, a documentação e o health check.
  *
  * @since 0.0.1
  */
@@ -37,6 +37,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class SecurityConfig {
 
     private static final String[] ROTAS_PUBLICAS = {
+            "/api/v1/auth/cadastro",
             "/api/v1/auth/login",
             "/api/v1/auth/refresh",
             "/api/v1/auth/logout"

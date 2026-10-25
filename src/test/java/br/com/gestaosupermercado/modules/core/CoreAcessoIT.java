@@ -55,6 +55,38 @@ class CoreAcessoIT {
     }
 
     @Test
+    void shouldCadastrarContaPublicaSemPerfilAndWithoutAnyPermissao() throws Exception {
+        final String email = newEmail();
+
+        mockMvc.perform(post("/api/v1/auth/cadastro")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cadastroBody(email, SENHA_PADRAO)))
+                .andExpect(status().isCreated());
+        final String accessToken = loginAccessToken(email, SENHA_PADRAO);
+
+        mockMvc.perform(get("/api/v1/core/usuarios/me").header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.perfis", Matchers.empty()))
+                .andExpect(jsonPath("$.permissoes", Matchers.empty()));
+        mockMvc.perform(get("/api/v1/core/usuarios").header(HttpHeaders.AUTHORIZATION, bearer(accessToken)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldRejectCadastroWithEmailRepetidoOrSenhaFraca() throws Exception {
+        final String email = newEmail();
+        mockMvc.perform(post("/api/v1/auth/cadastro").contentType(MediaType.APPLICATION_JSON).content(cadastroBody(email, SENHA_PADRAO)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/v1/auth/cadastro").contentType(MediaType.APPLICATION_JSON)
+                        .content(cadastroBody(email.toUpperCase(), SENHA_PADRAO)))
+                .andExpect(status().isConflict());
+        mockMvc.perform(post("/api/v1/auth/cadastro").contentType(MediaType.APPLICATION_JSON).content(cadastroBody(newEmail(), "semnumero")))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.campos[0].campo").value("senha"));
+    }
+
+    @Test
     void shouldReturnEveryPermissaoForBootstrapSuperadmin() throws Exception {
         final String accessToken = loginAccessToken(ADMIN_EMAIL, ADMIN_SENHA);
 
@@ -244,6 +276,10 @@ class CoreAcessoIT {
 
     private static String loginBody(final String email, final String senha) {
         return "{\"email\": \"%s\", \"senha\": \"%s\"}".formatted(email, senha);
+    }
+
+    private static String cadastroBody(final String email, final String senha) {
+        return "{\"nome\": \"Dono do mercado\", \"email\": \"%s\", \"senha\": \"%s\"}".formatted(email, senha);
     }
 
     private static String refreshBody(final String refreshToken) {
