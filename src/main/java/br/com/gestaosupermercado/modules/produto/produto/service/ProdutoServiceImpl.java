@@ -9,6 +9,7 @@ import br.com.gestaosupermercado.modules.produto.produto.repository.specs.Produt
 import br.com.gestaosupermercado.shared.dto.PaginaResponse;
 import br.com.gestaosupermercado.shared.exception.BusinessException;
 import br.com.gestaosupermercado.shared.exception.ErrorMessage;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -107,6 +108,12 @@ public class ProdutoServiceImpl implements ProdutoService {
         }
         return produtoRepository.findAllById(ids).stream()
                 .collect(Collectors.toMap(Produto::getId, Produto::getNome));
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void updatePrecoCustoProduto(final Long id, final BigDecimal precoCusto) {
+        findProdutoEntityById(id).setPrecoCusto(precoCusto);
     }
 
     private Produto findProdutoEntityById(final Long id) {

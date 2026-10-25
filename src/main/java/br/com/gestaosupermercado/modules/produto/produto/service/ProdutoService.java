@@ -5,6 +5,7 @@ import br.com.gestaosupermercado.modules.produto.produto.dto.request.ProdutoRequ
 import br.com.gestaosupermercado.modules.produto.produto.dto.response.ProdutoResponse;
 import br.com.gestaosupermercado.modules.produto.produto.model.Produto;
 import br.com.gestaosupermercado.shared.dto.PaginaResponse;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import org.springframework.data.domain.Pageable;
@@ -33,4 +34,10 @@ public interface ProdutoService {
      * Ids inexistentes ficam fora do mapa.
      */
     Map<Long, String> findNomesProdutosByIds(Collection<Long> ids);
+
+    /**
+     * Atualiza o preço de custo com o valor pago na compra mais recente, base da margem nos relatórios.
+     * Chamado pelo módulo de compras dentro da transação da compra.
+     */
+    void updatePrecoCustoProduto(Long id, BigDecimal precoCusto);
 }
