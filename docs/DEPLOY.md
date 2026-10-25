@@ -27,6 +27,7 @@ As migrations do Flyway criam as tabelas na primeira subida da API.
    - `DB_URL`: a URL JDBC do passo anterior
    - `DB_USERNAME` / `DB_PASSWORD`: do Neon
    - `ADMIN_EMAIL` / `ADMIN_SENHA`: o primeiro Superadmin (só é usado enquanto não houver usuário)
+   - `CORS_ALLOWED_ORIGINS`: a URL do front publicado (ex.: `https://meu-front.vercel.app`); várias, separadas por vírgula
    - `JWT_SECRET` é gerado pelo Render automaticamente
 4. Aguarde o deploy e teste: `https://<seu-app>.onrender.com/actuator/health/liveness` deve responder `{"status":"UP"}`.
 

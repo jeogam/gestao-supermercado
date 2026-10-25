@@ -67,6 +67,8 @@ Authorization: Bearer <accessToken>
 - Corpo sempre `Content-Type: application/json` em **UTF-8**.
 - Texto é aparado (`strip`) pelo backend; strings opcionais em branco viram `null`.
 - E-mails são guardados em minúsculas.
+- **CORS:** só as origens em `CORS_ALLOWED_ORIGINS` (padrão `http://localhost:5173`, separadas por vírgula) podem
+  chamar a API pelo navegador. Em produção, defina a URL do front publicado.
 
 ### Status HTTP
 
@@ -463,9 +465,6 @@ Valor fora da lista no corpo → `400 "Corpo da requisição inválido."`.
 
 ## 6. Pendências conhecidas
 
-- **CORS não está configurado.** Um front servido em outra origem (ex.: `http://localhost:5173`) terá as chamadas
-  bloqueadas pelo navegador. Até ser configurado no backend, use o proxy do servidor de desenvolvimento do front (ex.:
-  `server.proxy` no Vite apontando `/api` para `http://localhost:8080`).
 - **Relatórios (`RELATORIO_VISUALIZAR`)** ainda não têm endpoints: faturamento por período, margem e PDF.
 - Respostas trazem `usuarioId` (quem vendeu, comprou, ajustou), mas não o nome do usuário. Para exibir nomes, quem tem
   `USUARIO_LISTAR` pode consultar `/core/usuarios`; para os demais perfis ainda não há endpoint.
