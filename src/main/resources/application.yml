@@ -23,6 +23,9 @@ app:
       issuer: gestao-supermercado
       access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:15m}
       refresh-token-ttl: ${JWT_REFRESH_TOKEN_TTL:7d}
+    cors:
+      # Origens do front separadas por vírgula (ex.: https://meu-front.com). Vazio = só mesma origem.
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
     login:
       max-tentativas: 5
       tempo-bloqueio: 15m

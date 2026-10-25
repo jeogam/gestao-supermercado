@@ -100,6 +100,13 @@ exige `VENDA_REGISTRAR` e cancelar exige `VENDA_CANCELAR` (o Caixa tem as três,
 - Cada item guarda o preço e o **custo do momento da venda**, para os relatórios de margem não mudarem com reajustes
   posteriores. O custo nunca aparece nas respostas de venda.
 
+### Relatórios (`modules/relatorio`)
+
+Faturamento do período (`GET /api/v1/relatorio/relatorios/faturamento`), margem por produto (`/margem`) e os dois em
+PDF (`/pdf`), todos com `dataInicio` e `dataFim` obrigatórios e a permissão `RELATORIO_VISUALIZAR` (Gerente e
+Superadmin). Só vendas concluídas entram nos valores, e o custo usado é o guardado em cada item no momento da venda.
+Os totais são somados no banco por consultas só de leitura (`RelatorioRepository`); o PDF é gerado com OpenPDF.
+
 ### Perfis
 
 | Perfil | Pode fazer |
@@ -125,6 +132,7 @@ A aplicação não sobe se o enum e a tabela `permissao` estiverem diferentes (`
 Pré-requisitos: JDK 21+ e Docker.
 
 1. Copie `.env.example` para `.env` e preencha `DB_PASSWORD`, `JWT_SECRET`, `ADMIN_EMAIL` e `ADMIN_SENHA`.
+   `CORS_ALLOWED_ORIGINS` define quais fronts podem chamar a API (padrão `http://localhost:5173`).
 2. Suba o banco: `docker compose up -d db`
 3. Rode a API: `./mvnw spring-boot:run`
 

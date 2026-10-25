@@ -16,7 +16,7 @@ permissões, corpos de requisição, respostas e regras que afetam as telas.
 3. [Perfis e permissões (o que mostrar para quem)](#3-perfis-e-permissões-o-que-mostrar-para-quem)
 4. [Endpoints](#4-endpoints)
    - [Auth](#41-auth) · [Usuários](#42-usuários) · [Perfis e permissões](#43-perfis-e-permissões) ·
-     [Produtos](#44-produtos) · [Estoque](#45-estoque) · [Compras](#46-compras) · [Vendas](#47-vendas)
+     [Produtos](#44-produtos) · [Estoque](#45-estoque) · [Compras](#46-compras) · [Vendas](#47-vendas) · [Relatórios](#48-relatórios)
 5. [Enums](#5-enums)
 6. [Pendências conhecidas](#6-pendências-conhecidas)
 7. [Mantendo este documento atualizado](#7-mantendo-este-documento-atualizado)
@@ -67,6 +67,8 @@ Authorization: Bearer <accessToken>
 - Corpo sempre `Content-Type: application/json` em **UTF-8**.
 - Texto é aparado (`strip`) pelo backend; strings opcionais em branco viram `null`.
 - E-mails são guardados em minúsculas.
+- **CORS:** só as origens em `CORS_ALLOWED_ORIGINS` (padrão `http://localhost:5173`, separadas por vírgula) podem
+  chamar a API pelo navegador. Em produção, defina a URL do front publicado.
 
 ### Status HTTP
 
@@ -75,10 +77,11 @@ Authorization: Bearer <accessToken>
 | `200` | Consulta ou edição com corpo de resposta |
 | `201` | Criação (corpo traz o recurso criado) |
 | `204` | Operação sem corpo (troca de status, senha, logout) |
-| `400` | JSON malformado ou valor de enum inexistente (`"Corpo da requisição inválido."`) |
+| `400` | JSON malformado ou valor de enum inexistente (`"Corpo da requisição inválido."`); parâmetro de rota/query com tipo errado (ex.: id `abc`) |
 | `401` | Não autenticado / sessão expirada / credenciais inválidas no login |
 | `403` | Autenticado, mas sem a permissão exigida |
 | `404` | Recurso (ou recurso referenciado no corpo, como `produtoId`) não existe |
+| `405` / `415` | Método HTTP errado na rota / corpo sem `application/json` |
 | `409` | Conflito: valor único repetido (e-mail, código de barras, CNPJ, nome de perfil) ou registro alterado ao mesmo tempo por outra operação — **ofereça "tentar de novo"** |
 | `422` | Validação de campos ou regra de negócio (estoque insuficiente, produto inativo...) |
 | `500` | Erro inesperado; detalhes só no log do servidor |
@@ -165,7 +168,7 @@ O front deve habilitar cada área pela **permissão** presente em `GET /core/usu
 | `ESTOQUE_AJUSTAR` | Ajuste manual de estoque | | ✔ | ✔ | ✔ |
 | `COMPRA_LISTAR` | Consultar compras e fornecedores | | ✔ | ✔ | ✔ |
 | `COMPRA_REGISTRAR` | Lançar compra; cadastrar/editar fornecedor | | ✔ | ✔ | ✔ |
-| `RELATORIO_VISUALIZAR` | Relatórios (módulo ainda não implementado) | | | ✔ | ✔ |
+| `RELATORIO_VISUALIZAR` | Faturamento, margem por produto e PDF | | | ✔ | ✔ |
 | `USUARIO_LISTAR` | Listar usuários | | | | ✔ |
 | `USUARIO_CRIAR` | Cadastrar usuário | | | | ✔ |
 | `USUARIO_EDITAR` | Editar usuário e seus perfis | | | | ✔ |
@@ -444,6 +447,32 @@ Regras:
 - O custo dos itens nunca é devolvido nas respostas de venda.
 - Máximo de 200 itens por venda.
 
+### 4.8 Relatórios
+
+Só vendas `CONCLUIDA` entram nos valores; o custo é o guardado em cada item no momento da venda. `dataInicio` e
+`dataFim` são **obrigatórios** (ISO-8601 com fuso, inclusive nas duas pontas).
+
+| Método | Rota | Permissão | Query | Resposta |
+|--------|------|-----------|-------|----------|
+| `GET` | `/relatorio/relatorios/faturamento` | `RELATORIO_VISUALIZAR` | `dataInicio`, `dataFim` | `200 FaturamentoResponse` · `422` período ausente/invertido |
+| `GET` | `/relatorio/relatorios/margem` | `RELATORIO_VISUALIZAR` | `dataInicio`, `dataFim` | `200 MargemProdutoResponse[]` (maior lucro primeiro, sem paginação) · `422` |
+| `GET` | `/relatorio/relatorios/pdf` | `RELATORIO_VISUALIZAR` | `dataInicio`, `dataFim` | `200 application/pdf` (`Content-Disposition: attachment`) · `422` em JSON |
+
+```jsonc
+// FaturamentoResponse
+{ "dataInicio": "2026-10-01T00:00:00-03:00", "dataFim": "2026-10-31T23:59:59-03:00",
+  "quantidadeVendas": 120, "quantidadeVendasCanceladas": 3,
+  "faturamento": 4820.50, "custo": 3410.20, "lucro": 1410.30,
+  "margemPercentual": 29.26,          // lucro / faturamento x 100; 0 quando não há vendas
+  "formasPagamento": [ { "formaPagamento": "PIX", "quantidadeVendas": 42, "faturamento": 1530.40 } ] }
+
+// MargemProdutoResponse
+{ "produtoId": 12, "nome": "Arroz Tipo 1 5kg", "quantidadeVendida": 35,
+  "faturamento": 836.50, "custo": 630.00, "lucro": 206.50, "margemPercentual": 24.69 }
+```
+
+Para baixar o PDF no front, chame com o header `Authorization` (`fetch` → `blob()`), não com um link simples.
+
 ---
 
 ## 5. Enums
@@ -463,10 +492,6 @@ Valor fora da lista no corpo → `400 "Corpo da requisição inválido."`.
 
 ## 6. Pendências conhecidas
 
-- **CORS não está configurado.** Um front servido em outra origem (ex.: `http://localhost:5173`) terá as chamadas
-  bloqueadas pelo navegador. Até ser configurado no backend, use o proxy do servidor de desenvolvimento do front (ex.:
-  `server.proxy` no Vite apontando `/api` para `http://localhost:8080`).
-- **Relatórios (`RELATORIO_VISUALIZAR`)** ainda não têm endpoints: faturamento por período, margem e PDF.
 - Respostas trazem `usuarioId` (quem vendeu, comprou, ajustou), mas não o nome do usuário. Para exibir nomes, quem tem
   `USUARIO_LISTAR` pode consultar `/core/usuarios`; para os demais perfis ainda não há endpoint.
 

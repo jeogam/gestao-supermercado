@@ -1467,6 +1467,225 @@
         }
       }
     },
+    "/api/v1/relatorio/relatorios/pdf": {
+      "get": {
+        "tags": [
+          "Relatórios"
+        ],
+        "summary": "Relatório do período em PDF (faturamento e margem por produto)",
+        "operationId": "generateRelatorioPdf",
+        "parameters": [
+          {
+            "name": "dataInicio",
+            "in": "query",
+            "description": "A partir deste momento (inclusive)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "A partir deste momento (inclusive)",
+              "example": "2026-10-01T00:00:00-03:00"
+            },
+            "example": "2026-10-01T00:00:00-03:00"
+          },
+          {
+            "name": "dataFim",
+            "in": "query",
+            "description": "Até este momento (inclusive)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Até este momento (inclusive)",
+              "example": "2026-10-31T23:59:59-03:00"
+            },
+            "example": "2026-10-31T23:59:59-03:00"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF gerado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Período ausente ou inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/relatorio/relatorios/margem": {
+      "get": {
+        "tags": [
+          "Relatórios"
+        ],
+        "summary": "Margem por produto no período, do maior para o menor lucro",
+        "operationId": "findMargemProdutos",
+        "parameters": [
+          {
+            "name": "dataInicio",
+            "in": "query",
+            "description": "A partir deste momento (inclusive)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "A partir deste momento (inclusive)",
+              "example": "2026-10-01T00:00:00-03:00"
+            },
+            "example": "2026-10-01T00:00:00-03:00"
+          },
+          {
+            "name": "dataFim",
+            "in": "query",
+            "description": "Até este momento (inclusive)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Até este momento (inclusive)",
+              "example": "2026-10-31T23:59:59-03:00"
+            },
+            "example": "2026-10-31T23:59:59-03:00"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Relatório gerado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MargemProdutoResponse"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MargemProdutoResponse"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Período ausente ou inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MargemProdutoResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/relatorio/relatorios/faturamento": {
+      "get": {
+        "tags": [
+          "Relatórios"
+        ],
+        "summary": "Faturamento, custo, lucro e margem do período, com o faturamento por forma de pagamento",
+        "operationId": "findFaturamento",
+        "parameters": [
+          {
+            "name": "dataInicio",
+            "in": "query",
+            "description": "A partir deste momento (inclusive)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "A partir deste momento (inclusive)",
+              "example": "2026-10-01T00:00:00-03:00"
+            },
+            "example": "2026-10-01T00:00:00-03:00"
+          },
+          {
+            "name": "dataFim",
+            "in": "query",
+            "description": "Até este momento (inclusive)",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Até este momento (inclusive)",
+              "example": "2026-10-31T23:59:59-03:00"
+            },
+            "example": "2026-10-31T23:59:59-03:00"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Relatório gerado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaturamentoResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaturamentoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Período ausente ou inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FaturamentoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/produto/produtos": {
       "get": {
         "tags": [
@@ -2455,7 +2674,7 @@
           "valorRecebido": {
             "type": "number",
             "description": "Valor entregue pelo cliente (dinheiro)",
-            "example": 50
+            "example": 50.0
           },
           "troco": {
             "type": "number",
@@ -3011,7 +3230,7 @@
           "valorRecebido": {
             "type": "number",
             "description": "Valor entregue pelo cliente (só no pagamento em dinheiro); usado para calcular o troco",
-            "example": 50
+            "example": 50.0
           },
           "itens": {
             "type": "array",
@@ -3283,7 +3502,7 @@
           "valorTotal": {
             "type": "number",
             "description": "Soma dos subtotais dos itens",
-            "example": 444
+            "example": 444.0
           },
           "observacao": {
             "type": "string",
@@ -3337,7 +3556,7 @@
           "subtotal": {
             "type": "number",
             "description": "Quantidade x custo unitário",
-            "example": 444
+            "example": 444.0
           }
         }
       },
@@ -3487,6 +3706,131 @@
             "type": "string",
             "format": "date-time",
             "description": "Data/hora da venda"
+          }
+        }
+      },
+      "MargemProdutoResponse": {
+        "type": "object",
+        "description": "Margem de um produto nas vendas concluídas do período",
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Produto",
+            "example": 12
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome do produto",
+            "example": "Arroz Tipo 1 5kg"
+          },
+          "quantidadeVendida": {
+            "type": "number",
+            "description": "Quantidade vendida",
+            "example": 35
+          },
+          "faturamento": {
+            "type": "number",
+            "description": "Soma dos subtotais vendidos",
+            "example": 836.5
+          },
+          "custo": {
+            "type": "number",
+            "description": "Custo do que foi vendido, pelo custo do momento de cada venda",
+            "example": 630.0
+          },
+          "lucro": {
+            "type": "number",
+            "description": "Faturamento menos custo",
+            "example": 206.5
+          },
+          "margemPercentual": {
+            "type": "number",
+            "description": "Lucro sobre o faturamento, em %",
+            "example": 24.69
+          }
+        }
+      },
+      "FaturamentoFormaPagamentoResponse": {
+        "type": "object",
+        "description": "Faturamento de uma forma de pagamento no período",
+        "properties": {
+          "formaPagamento": {
+            "type": "string",
+            "description": "Forma de pagamento",
+            "enum": [
+              "DINHEIRO",
+              "CARTAO_DEBITO",
+              "CARTAO_CREDITO",
+              "PIX"
+            ],
+            "example": "PIX"
+          },
+          "quantidadeVendas": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Vendas concluídas",
+            "example": 42
+          },
+          "faturamento": {
+            "type": "number",
+            "description": "Soma do total das vendas",
+            "example": 1530.4
+          }
+        }
+      },
+      "FaturamentoResponse": {
+        "type": "object",
+        "description": "Faturamento, custo e margem das vendas concluídas no período",
+        "properties": {
+          "dataInicio": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Início do período"
+          },
+          "dataFim": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fim do período"
+          },
+          "quantidadeVendas": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Vendas concluídas",
+            "example": 120
+          },
+          "quantidadeVendasCanceladas": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Vendas canceladas (ficam fora dos valores)",
+            "example": 3
+          },
+          "faturamento": {
+            "type": "number",
+            "description": "Soma do total das vendas concluídas",
+            "example": 4820.5
+          },
+          "custo": {
+            "type": "number",
+            "description": "Custo das mercadorias vendidas, pelo custo do momento de cada venda",
+            "example": 3410.2
+          },
+          "lucro": {
+            "type": "number",
+            "description": "Faturamento menos custo",
+            "example": 1410.3
+          },
+          "margemPercentual": {
+            "type": "number",
+            "description": "Lucro sobre o faturamento, em %",
+            "example": 29.26
+          },
+          "formasPagamento": {
+            "type": "array",
+            "description": "Faturamento por forma de pagamento",
+            "items": {
+              "$ref": "#/components/schemas/FaturamentoFormaPagamentoResponse"
+            }
           }
         }
       },
@@ -3830,7 +4174,7 @@
           "valorTotal": {
             "type": "number",
             "description": "Valor total",
-            "example": 444
+            "example": 444.0
           },
           "usuarioId": {
             "type": "integer",
