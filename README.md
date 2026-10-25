@@ -2,6 +2,9 @@
 
 Backend da gestão de supermercado. Spring Boot 4, Java 21, PostgreSQL, Flyway e JWT.
 
+**Para o front:** o contrato completo da API (autenticação, convenções, endpoints, permissões e regras) está em
+[docs/API.md](docs/API.md), e a especificação OpenAPI gerada pela aplicação em [docs/openapi.json](docs/openapi.json).
+
 ## Módulos
 
 O código é organizado por módulo de negócio em `src/main/java/br/com/gestaosupermercado/modules/<modulo>/<subdominio>/`,

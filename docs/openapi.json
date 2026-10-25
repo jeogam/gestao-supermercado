@@ -1,0 +1,3894 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Gestão Supermercado API",
+    "version": "v1"
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/v1/venda/vendas/venda/{id}/cancelamento": {
+      "put": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Cancela (ou desfaz) uma venda e devolve os itens ao estoque",
+        "operationId": "cancelVenda",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelamentoVendaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Venda cancelada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Venda não encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A venda ou um produto foi alterado ao mesmo tempo por outra operação",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "A venda já está cancelada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/produto/produtos/produto/{id}": {
+      "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Detalha um produto",
+        "operationId": "findProdutoById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produto não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Edita os dados de um produto (não altera a quantidade em estoque)",
+        "operationId": "updateProduto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProdutoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Produto atualizado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produto não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Código de barras já cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/produto/produtos/produto/{id}/status": {
+      "put": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Ativa ou inativa um produto; inativo não pode ser vendido nem movimentado",
+        "operationId": "updateStatusProduto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Status alterado"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        }
+      }
+    },
+    "/api/v1/core/usuarios/usuario/{id}": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Detalha um usuário",
+        "operationId": "findUsuarioById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Edita nome, e-mail e perfis de um usuário",
+        "operationId": "updateUsuario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário ou perfil não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "E-mail já cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos, perfil inativo ou remoção do último Superadmin",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/core/usuarios/usuario/{id}/status": {
+      "put": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Ativa ou inativa um usuário; inativar encerra as sessões dele",
+        "operationId": "updateStatusUsuario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Status alterado"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          },
+          "422": {
+            "description": "Próprio usuário ou último Superadmin"
+          }
+        }
+      }
+    },
+    "/api/v1/core/usuarios/usuario/{id}/senha": {
+      "put": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Redefine a senha de um usuário e encerra as sessões dele",
+        "operationId": "updateSenhaUsuario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenhaRedefinicaoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Senha redefinida"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          },
+          "422": {
+            "description": "Senha fora da política"
+          }
+        }
+      }
+    },
+    "/api/v1/core/usuarios/me/senha": {
+      "put": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Troca a própria senha; todas as sessões são encerradas",
+        "operationId": "updateSenhaUsuarioLogado",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenhaAlteracaoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Senha alterada"
+          },
+          "422": {
+            "description": "Senha atual incorreta ou nova senha fora da política"
+          }
+        }
+      }
+    },
+    "/api/v1/core/perfis/perfil/{id}": {
+      "get": {
+        "tags": [
+          "Perfis"
+        ],
+        "summary": "Detalha um perfil com suas permissões",
+        "operationId": "findPerfilById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Perfil não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Perfis"
+        ],
+        "summary": "Edita nome, descrição e permissões de um perfil",
+        "operationId": "updatePerfil",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerfilRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Perfil não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Nome já cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos ou perfil do sistema",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/core/perfis/perfil/{id}/status": {
+      "put": {
+        "tags": [
+          "Perfis"
+        ],
+        "summary": "Ativa ou inativa um perfil",
+        "operationId": "updateStatusPerfil",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Status alterado"
+          },
+          "404": {
+            "description": "Perfil não encontrado"
+          },
+          "422": {
+            "description": "Perfil do sistema"
+          }
+        }
+      }
+    },
+    "/api/v1/compra/fornecedores/fornecedor/{id}": {
+      "get": {
+        "tags": [
+          "Compras - Fornecedores"
+        ],
+        "summary": "Detalha um fornecedor",
+        "operationId": "findFornecedorById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fornecedor encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fornecedor não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Compras - Fornecedores"
+        ],
+        "summary": "Edita os dados de um fornecedor",
+        "operationId": "updateFornecedor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FornecedorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Fornecedor atualizado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fornecedor não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CNPJ já cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compra/fornecedores/fornecedor/{id}/status": {
+      "put": {
+        "tags": [
+          "Compras - Fornecedores"
+        ],
+        "summary": "Ativa ou inativa um fornecedor; inativo não recebe novas compras",
+        "operationId": "updateStatusFornecedor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Status alterado"
+          },
+          "404": {
+            "description": "Fornecedor não encontrado"
+          }
+        }
+      }
+    },
+    "/api/v1/venda/vendas/venda": {
+      "post": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Registra uma venda: usa o preço do cadastro e dá baixa no estoque de cada item",
+        "operationId": "saveVenda",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VendaRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Venda registrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produto não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Um produto foi movimentado ao mesmo tempo por outra operação",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos, produto inativo, estoque insuficiente ou valor recebido menor que o total",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/produto/produtos/produto": {
+      "post": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Cadastra um produto (estoque inicial zero)",
+        "operationId": "saveProduto",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProdutoRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Produto criado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Código de barras já cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProdutoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estoque/movimentacoes/ajuste": {
+      "post": {
+        "tags": [
+          "Estoque - Movimentações"
+        ],
+        "summary": "Ajusta manualmente o estoque de um produto (entrada ou saída, com motivo)",
+        "operationId": "saveAjuste",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AjusteEstoqueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Ajuste registrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produto não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "O produto foi movimentado ao mesmo tempo por outra operação",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos, produto inativo ou estoque insuficiente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/core/usuarios/usuario": {
+      "post": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Cadastra um usuário com senha inicial e perfis",
+        "operationId": "saveUsuario",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Perfil não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "E-mail já cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos ou perfil inativo",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/core/perfis/perfil": {
+      "post": {
+        "tags": [
+          "Perfis"
+        ],
+        "summary": "Cadastra um perfil",
+        "operationId": "savePerfil",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerfilRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Perfil criado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Nome já cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compra/fornecedores/fornecedor": {
+      "post": {
+        "tags": [
+          "Compras - Fornecedores"
+        ],
+        "summary": "Cadastra um fornecedor",
+        "operationId": "saveFornecedor",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FornecedorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Fornecedor criado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CNPJ já cadastrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/FornecedorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compra/compras/compra": {
+      "post": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Lança uma compra: dá entrada no estoque de cada item e atualiza o preço de custo dos produtos",
+        "operationId": "saveCompra",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompraRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Compra registrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Fornecedor ou produto não encontrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Um produto foi movimentado ao mesmo tempo por outra operação",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos, fornecedor/produto inativo ou produto repetido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Renova a sessão; o refresh token enviado deixa de valer",
+        "operationId": "refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sessão renovada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token inválido, expirado ou já utilizado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Encerra a sessão do refresh token informado",
+        "operationId": "logout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Sessão encerrada (idempotente)"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "summary": "Autentica com e-mail e senha e abre uma sessão",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciais inválidas, usuário inativo ou bloqueado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Dados inválidos",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/v1/venda/vendas": {
+      "get": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Lista vendas com filtros (status, forma de pagamento, operador, período) e paginação",
+        "operationId": "findAllVendas",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Concluída ou cancelada",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Concluída ou cancelada",
+              "enum": [
+                "CONCLUIDA",
+                "CANCELADA"
+              ],
+              "example": "CONCLUIDA"
+            },
+            "example": "CONCLUIDA"
+          },
+          {
+            "name": "formaPagamento",
+            "in": "query",
+            "description": "Forma de pagamento",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Forma de pagamento",
+              "enum": [
+                "DINHEIRO",
+                "CARTAO_DEBITO",
+                "CARTAO_CREDITO",
+                "PIX"
+              ],
+              "example": "PIX"
+            },
+            "example": "PIX"
+          },
+          {
+            "name": "usuarioId",
+            "in": "query",
+            "description": "Somente vendas registradas por este usuário",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Somente vendas registradas por este usuário",
+              "example": 3
+            },
+            "example": 3
+          },
+          {
+            "name": "dataInicio",
+            "in": "query",
+            "description": "A partir deste momento (inclusive)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "A partir deste momento (inclusive)",
+              "example": "2026-10-01T00:00:00-03:00"
+            },
+            "example": "2026-10-01T00:00:00-03:00"
+          },
+          {
+            "name": "dataFim",
+            "in": "query",
+            "description": "Até este momento (inclusive)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Até este momento (inclusive)",
+              "example": "2026-10-31T23:59:59-03:00"
+            },
+            "example": "2026-10-31T23:59:59-03:00"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "default": [
+                "criadoEm,DESC"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página retornada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseVendaResumoResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseVendaResumoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Período inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseVendaResumoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/venda/vendas/venda/{id}": {
+      "get": {
+        "tags": [
+          "Vendas"
+        ],
+        "summary": "Detalha uma venda com seus itens",
+        "operationId": "findVendaById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venda encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Venda não encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendaResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/produto/produtos": {
+      "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Lista produtos com filtros (nome, código de barras, status, reposição) e paginação",
+        "operationId": "findAllProdutos",
+        "parameters": [
+          {
+            "name": "nome",
+            "in": "query",
+            "description": "Parte do nome",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Parte do nome",
+              "example": "arroz",
+              "maxLength": 255,
+              "minLength": 0
+            },
+            "example": "arroz"
+          },
+          {
+            "name": "codigoBarras",
+            "in": "query",
+            "description": "Código de barras exato",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Código de barras exato",
+              "example": 7891234567890,
+              "maxLength": 50,
+              "minLength": 0
+            },
+            "example": 7891234567890
+          },
+          {
+            "name": "ativo",
+            "in": "query",
+            "description": "Status do produto",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Status do produto",
+              "example": true
+            },
+            "example": true
+          },
+          {
+            "name": "abaixoEstoqueMinimo",
+            "in": "query",
+            "description": "Somente produtos abaixo do estoque mínimo (alerta de reposição)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Somente produtos abaixo do estoque mínimo (alerta de reposição)",
+              "example": true
+            },
+            "example": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "default": [
+                "nome,ASC"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página retornada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseProdutoResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseProdutoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estoque/reposicao": {
+      "get": {
+        "tags": [
+          "Estoque - Reposição"
+        ],
+        "summary": "Lista os produtos ativos abaixo do estoque mínimo, com a quantidade que falta",
+        "operationId": "findAllProdutosParaRepor",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "default": [
+                "nome,ASC"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página retornada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseReposicaoResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseReposicaoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estoque/movimentacoes": {
+      "get": {
+        "tags": [
+          "Estoque - Movimentações"
+        ],
+        "summary": "Lista o histórico de movimentações com filtros (produto, tipo, origem, período) e paginação",
+        "operationId": "findAllMovimentacoes",
+        "parameters": [
+          {
+            "name": "produtoId",
+            "in": "query",
+            "description": "Somente movimentações deste produto",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Somente movimentações deste produto",
+              "example": 12
+            },
+            "example": 12
+          },
+          {
+            "name": "tipo",
+            "in": "query",
+            "description": "Entrada ou saída",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Entrada ou saída",
+              "enum": [
+                "ENTRADA",
+                "SAIDA"
+              ],
+              "example": "SAIDA"
+            },
+            "example": "SAIDA"
+          },
+          {
+            "name": "origem",
+            "in": "query",
+            "description": "O que gerou a movimentação",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "O que gerou a movimentação",
+              "enum": [
+                "AJUSTE",
+                "COMPRA",
+                "VENDA",
+                "ESTORNO_VENDA"
+              ],
+              "example": "AJUSTE"
+            },
+            "example": "AJUSTE"
+          },
+          {
+            "name": "dataInicio",
+            "in": "query",
+            "description": "A partir deste momento (inclusive)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "A partir deste momento (inclusive)",
+              "example": "2026-10-01T00:00:00-03:00"
+            },
+            "example": "2026-10-01T00:00:00-03:00"
+          },
+          {
+            "name": "dataFim",
+            "in": "query",
+            "description": "Até este momento (inclusive)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Até este momento (inclusive)",
+              "example": "2026-10-31T23:59:59-03:00"
+            },
+            "example": "2026-10-31T23:59:59-03:00"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "default": [
+                "criadoEm,DESC"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página retornada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseMovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseMovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Período inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseMovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estoque/movimentacoes/movimentacao/{id}": {
+      "get": {
+        "tags": [
+          "Estoque - Movimentações"
+        ],
+        "summary": "Detalha uma movimentação",
+        "operationId": "findMovimentacaoById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Movimentação encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Movimentação não encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovimentacaoEstoqueResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/core/usuarios": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Lista usuários com filtros e paginação",
+        "operationId": "findAllUsuarios",
+        "parameters": [
+          {
+            "name": "nome",
+            "in": "query",
+            "description": "Parte do nome",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Parte do nome",
+              "example": "maria",
+              "maxLength": 255,
+              "minLength": 0
+            },
+            "example": "maria"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "Parte do e-mail",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Parte do e-mail",
+              "example": "@mercado.com",
+              "maxLength": 255,
+              "minLength": 0
+            },
+            "example": "@mercado.com"
+          },
+          {
+            "name": "ativo",
+            "in": "query",
+            "description": "Status do usuário",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Status do usuário",
+              "example": true
+            },
+            "example": true
+          },
+          {
+            "name": "perfilId",
+            "in": "query",
+            "description": "Somente usuários com este perfil",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Somente usuários com este perfil",
+              "example": 3,
+              "exclusiveMinimum": 0
+            },
+            "example": 3
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "default": [
+                "nome,ASC"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página retornada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseUsuarioResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseUsuarioResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/core/usuarios/me": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Dados, perfis e permissões efetivas do usuário autenticado",
+        "operationId": "findUsuarioLogado",
+        "responses": {
+          "200": {
+            "description": "Usuário autenticado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioLogadoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/core/permissoes": {
+      "get": {
+        "tags": [
+          "Permissões"
+        ],
+        "summary": "Lista o catálogo de permissões disponíveis para montar perfis",
+        "operationId": "findAllPermissoes",
+        "responses": {
+          "200": {
+            "description": "Catálogo retornado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissaoResponse"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissaoResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/core/perfis": {
+      "get": {
+        "tags": [
+          "Perfis"
+        ],
+        "summary": "Lista os perfis, opcionalmente filtrando por status",
+        "operationId": "findAllPerfis",
+        "parameters": [
+          {
+            "name": "ativo",
+            "in": "query",
+            "description": "Filtra por ativo/inativo; omitido retorna todos",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfis retornados",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PerfilResponse"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PerfilResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compra/fornecedores": {
+      "get": {
+        "tags": [
+          "Compras - Fornecedores"
+        ],
+        "summary": "Lista fornecedores com filtros (nome, CNPJ, status) e paginação",
+        "operationId": "findAllFornecedores",
+        "parameters": [
+          {
+            "name": "nome",
+            "in": "query",
+            "description": "Parte do nome",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Parte do nome",
+              "example": "atacad",
+              "maxLength": 255,
+              "minLength": 0
+            },
+            "example": "atacad"
+          },
+          {
+            "name": "cnpj",
+            "in": "query",
+            "description": "CNPJ exato, com ou sem pontuação",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "CNPJ exato, com ou sem pontuação",
+              "example": "12.345.678/0001-90",
+              "maxLength": 18,
+              "minLength": 0
+            },
+            "example": "12.345.678/0001-90"
+          },
+          {
+            "name": "ativo",
+            "in": "query",
+            "description": "Status do fornecedor",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Status do fornecedor",
+              "example": true
+            },
+            "example": true
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "default": [
+                "nome,ASC"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página retornada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseFornecedorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseFornecedorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compra/compras": {
+      "get": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Lista compras com filtros (fornecedor, nota fiscal, período) e paginação",
+        "operationId": "findAllCompras",
+        "parameters": [
+          {
+            "name": "fornecedorId",
+            "in": "query",
+            "description": "Somente compras deste fornecedor",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Somente compras deste fornecedor",
+              "example": 4
+            },
+            "example": 4
+          },
+          {
+            "name": "numeroNotaFiscal",
+            "in": "query",
+            "description": "Número exato da nota fiscal",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Número exato da nota fiscal",
+              "example": "000123456",
+              "maxLength": 50,
+              "minLength": 0
+            },
+            "example": "000123456"
+          },
+          {
+            "name": "dataInicio",
+            "in": "query",
+            "description": "A partir deste momento (inclusive)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "A partir deste momento (inclusive)",
+              "example": "2026-10-01T00:00:00-03:00"
+            },
+            "example": "2026-10-01T00:00:00-03:00"
+          },
+          {
+            "name": "dataFim",
+            "in": "query",
+            "description": "Até este momento (inclusive)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Até este momento (inclusive)",
+              "example": "2026-10-31T23:59:59-03:00"
+            },
+            "example": "2026-10-31T23:59:59-03:00"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "default": [
+                "criadoEm,DESC"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página retornada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseCompraResumoResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Sem permissão",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseCompraResumoResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Período inválido",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaResponseCompraResumoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/compra/compras/compra/{id}": {
+      "get": {
+        "tags": [
+          "Compras"
+        ],
+        "summary": "Detalha uma compra com seus itens",
+        "operationId": "findCompraById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Compra encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Compra não encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompraResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CancelamentoVendaRequest": {
+        "type": "object",
+        "description": "Cancelamento (ou \"desfazer\") de uma venda",
+        "properties": {
+          "motivo": {
+            "type": "string",
+            "description": "Motivo do cancelamento",
+            "example": "Cliente desistiu da compra",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        }
+      },
+      "ItemVendaResponse": {
+        "type": "object",
+        "description": "Item de uma venda",
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Produto",
+            "example": 12
+          },
+          "produtoNome": {
+            "type": "string",
+            "description": "Nome do produto",
+            "example": "Arroz Tipo 1 5kg"
+          },
+          "quantidade": {
+            "type": "number",
+            "description": "Quantidade",
+            "example": 2
+          },
+          "precoUnitario": {
+            "type": "number",
+            "description": "Preço unitário no momento da venda",
+            "example": 23.9
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "Quantidade x preço unitário",
+            "example": 47.8
+          }
+        }
+      },
+      "VendaResponse": {
+        "type": "object",
+        "description": "Venda com seus itens",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 305
+          },
+          "status": {
+            "type": "string",
+            "description": "Concluída ou cancelada",
+            "enum": [
+              "CONCLUIDA",
+              "CANCELADA"
+            ],
+            "example": "CONCLUIDA"
+          },
+          "formaPagamento": {
+            "type": "string",
+            "description": "Forma de pagamento",
+            "enum": [
+              "DINHEIRO",
+              "CARTAO_DEBITO",
+              "CARTAO_CREDITO",
+              "PIX"
+            ],
+            "example": "DINHEIRO"
+          },
+          "valorTotal": {
+            "type": "number",
+            "description": "Soma dos subtotais dos itens",
+            "example": 47.8
+          },
+          "valorRecebido": {
+            "type": "number",
+            "description": "Valor entregue pelo cliente (dinheiro)",
+            "example": 50
+          },
+          "troco": {
+            "type": "number",
+            "description": "Troco (dinheiro)",
+            "example": 2.2
+          },
+          "usuarioId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Usuário que registrou a venda",
+            "example": 3
+          },
+          "criadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora da venda"
+          },
+          "canceladoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora do cancelamento"
+          },
+          "canceladoPorUsuarioId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Usuário que cancelou",
+            "example": 3
+          },
+          "motivoCancelamento": {
+            "type": "string",
+            "description": "Motivo do cancelamento",
+            "example": "Cliente desistiu da compra"
+          },
+          "itens": {
+            "type": "array",
+            "description": "Itens da venda",
+            "items": {
+              "$ref": "#/components/schemas/ItemVendaResponse"
+            }
+          }
+        }
+      },
+      "ProdutoRequest": {
+        "type": "object",
+        "description": "Dados para cadastro e edição de produto (a quantidade em estoque é movimentada pelo módulo de estoque)",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome do produto",
+            "example": "Arroz Tipo 1 5kg",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "codigoBarras": {
+            "type": "string",
+            "description": "Código de barras (EAN); opcional para itens a granel",
+            "example": 7891234567890,
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "unidadeMedida": {
+            "type": "string",
+            "description": "Unidade de venda",
+            "enum": [
+              "UN",
+              "KG",
+              "L"
+            ],
+            "example": "UN"
+          },
+          "precoCusto": {
+            "type": "number",
+            "description": "Preço de custo",
+            "example": 18.5
+          },
+          "precoVenda": {
+            "type": "number",
+            "description": "Preço de venda",
+            "example": 24.9
+          },
+          "estoqueMinimo": {
+            "type": "number",
+            "description": "Abaixo desta quantidade o produto entra no alerta de reposição",
+            "example": 10
+          }
+        },
+        "required": [
+          "estoqueMinimo",
+          "nome",
+          "precoCusto",
+          "precoVenda",
+          "unidadeMedida"
+        ]
+      },
+      "ProdutoResponse": {
+        "type": "object",
+        "description": "Produto",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 12
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome do produto",
+            "example": "Arroz Tipo 1 5kg"
+          },
+          "codigoBarras": {
+            "type": "string",
+            "description": "Código de barras",
+            "example": 7891234567890
+          },
+          "unidadeMedida": {
+            "type": "string",
+            "description": "Unidade de venda",
+            "enum": [
+              "UN",
+              "KG",
+              "L"
+            ],
+            "example": "UN"
+          },
+          "precoCusto": {
+            "type": "number",
+            "description": "Preço de custo; null para quem não tem PRODUTO_GERENCIAR",
+            "example": 18.5
+          },
+          "precoVenda": {
+            "type": "number",
+            "description": "Preço de venda",
+            "example": 24.9
+          },
+          "quantidadeEstoque": {
+            "type": "number",
+            "description": "Quantidade disponível em estoque",
+            "example": 42
+          },
+          "estoqueMinimo": {
+            "type": "number",
+            "description": "Estoque mínimo antes do alerta de reposição",
+            "example": 10
+          },
+          "abaixoEstoqueMinimo": {
+            "type": "boolean",
+            "description": "Se está abaixo do estoque mínimo",
+            "example": false
+          },
+          "ativo": {
+            "type": "boolean",
+            "description": "Se o produto pode ser vendido",
+            "example": true
+          },
+          "criadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora de cadastro"
+          }
+        }
+      },
+      "StatusRequest": {
+        "type": "object",
+        "description": "Alteração de status ativo/inativo de um recurso",
+        "properties": {
+          "ativo": {
+            "type": "boolean",
+            "description": "true para ativar, false para inativar",
+            "example": false
+          }
+        },
+        "required": [
+          "ativo"
+        ]
+      },
+      "UsuarioUpdateRequest": {
+        "type": "object",
+        "description": "Dados para edição de usuário (a senha tem endpoint próprio)",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome completo",
+            "example": "Maria Souza",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "E-mail usado no login",
+            "example": "maria@mercado.com",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "perfilIds": {
+            "type": "array",
+            "description": "Perfis (cargos) do usuário; substitui os atuais",
+            "example": [
+              2,
+              3
+            ],
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "email",
+          "nome",
+          "perfilIds"
+        ]
+      },
+      "PerfilResumoResponse": {
+        "type": "object",
+        "description": "Resumo de perfil vinculado a um usuário",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 2
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome",
+            "example": "Gerente"
+          },
+          "ativo": {
+            "type": "boolean",
+            "description": "Se o perfil está ativo (inativo não concede permissões)",
+            "example": true
+          }
+        }
+      },
+      "UsuarioResponse": {
+        "type": "object",
+        "description": "Usuário (nunca expõe hash de senha nem dados de bloqueio)",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 7
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome completo",
+            "example": "Maria Souza"
+          },
+          "email": {
+            "type": "string",
+            "description": "E-mail de login",
+            "example": "maria@mercado.com"
+          },
+          "ativo": {
+            "type": "boolean",
+            "description": "Se o usuário pode acessar o sistema",
+            "example": true
+          },
+          "ultimoLoginEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora do último login bem-sucedido"
+          },
+          "criadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora de cadastro"
+          },
+          "perfis": {
+            "type": "array",
+            "description": "Perfis (cargos) vinculados",
+            "items": {
+              "$ref": "#/components/schemas/PerfilResumoResponse"
+            }
+          }
+        }
+      },
+      "SenhaRedefinicaoRequest": {
+        "type": "object",
+        "description": "Redefinição da senha de outro usuário por quem tem permissão",
+        "properties": {
+          "novaSenha": {
+            "type": "string",
+            "description": "Nova senha: 8 a 72 caracteres, com letra e número",
+            "example": "NovaSenha1",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "novaSenha"
+        ]
+      },
+      "SenhaAlteracaoRequest": {
+        "type": "object",
+        "description": "Troca da própria senha",
+        "properties": {
+          "senhaAtual": {
+            "type": "string",
+            "description": "Senha atual",
+            "example": "SenhaAntiga1",
+            "maxLength": 72,
+            "minLength": 0
+          },
+          "novaSenha": {
+            "type": "string",
+            "description": "Nova senha: 8 a 72 caracteres, com letra e número",
+            "example": "NovaSenha1",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "novaSenha",
+          "senhaAtual"
+        ]
+      },
+      "PerfilRequest": {
+        "type": "object",
+        "description": "Dados para cadastro ou edição de perfil",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome único do perfil",
+            "example": "Fiscal de Caixa",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição do perfil",
+            "example": "Supervisiona os operadores de caixa",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "permissoes": {
+            "type": "array",
+            "description": "Permissões concedidas pelo perfil (substitui as atuais)",
+            "example": [
+              "USUARIO_LISTAR"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "USUARIO_LISTAR",
+                "USUARIO_CRIAR",
+                "USUARIO_EDITAR",
+                "USUARIO_ALTERAR_STATUS",
+                "USUARIO_REDEFINIR_SENHA",
+                "PERFIL_LISTAR",
+                "PERFIL_CRIAR",
+                "PERFIL_EDITAR",
+                "PERFIL_ALTERAR_STATUS",
+                "PERMISSAO_LISTAR",
+                "VENDA_LISTAR",
+                "VENDA_REGISTRAR",
+                "VENDA_CANCELAR",
+                "PRODUTO_LISTAR",
+                "PRODUTO_GERENCIAR",
+                "ESTOQUE_LISTAR",
+                "ESTOQUE_AJUSTAR",
+                "COMPRA_LISTAR",
+                "COMPRA_REGISTRAR",
+                "RELATORIO_VISUALIZAR"
+              ]
+            },
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "nome",
+          "permissoes"
+        ]
+      },
+      "PerfilResponse": {
+        "type": "object",
+        "description": "Perfil de acesso",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 2
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome",
+            "example": "Gerente"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição",
+            "example": "Gerência da loja"
+          },
+          "ativo": {
+            "type": "boolean",
+            "description": "Se o perfil está ativo",
+            "example": true
+          },
+          "sistema": {
+            "type": "boolean",
+            "description": "Perfil do sistema: não pode ser editado nem inativado",
+            "example": false
+          },
+          "permissoes": {
+            "type": "array",
+            "description": "Permissões concedidas, agrupadas por área do sistema",
+            "items": {
+              "type": "string",
+              "enum": [
+                "USUARIO_LISTAR",
+                "USUARIO_CRIAR",
+                "USUARIO_EDITAR",
+                "USUARIO_ALTERAR_STATUS",
+                "USUARIO_REDEFINIR_SENHA",
+                "PERFIL_LISTAR",
+                "PERFIL_CRIAR",
+                "PERFIL_EDITAR",
+                "PERFIL_ALTERAR_STATUS",
+                "PERMISSAO_LISTAR",
+                "VENDA_LISTAR",
+                "VENDA_REGISTRAR",
+                "VENDA_CANCELAR",
+                "PRODUTO_LISTAR",
+                "PRODUTO_GERENCIAR",
+                "ESTOQUE_LISTAR",
+                "ESTOQUE_AJUSTAR",
+                "COMPRA_LISTAR",
+                "COMPRA_REGISTRAR",
+                "RELATORIO_VISUALIZAR"
+              ]
+            }
+          }
+        }
+      },
+      "FornecedorRequest": {
+        "type": "object",
+        "description": "Dados para cadastro e edição de fornecedor",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome ou razão social",
+            "example": "Atacadão Irecê Ltda",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "cnpj": {
+            "type": "string",
+            "description": "CNPJ com ou sem pontuação; opcional para fornecedores sem CNPJ",
+            "example": "12.345.678/0001-90",
+            "pattern": "^\\s*$|^\\d{2}\\.?\\d{3}\\.?\\d{3}/?\\d{4}-?\\d{2}$"
+          },
+          "telefone": {
+            "type": "string",
+            "description": "Telefone de contato",
+            "example": "(74) 99999-0000",
+            "maxLength": 20,
+            "minLength": 0
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "E-mail de contato",
+            "example": "vendas@atacadao.com",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "nome"
+        ]
+      },
+      "FornecedorResponse": {
+        "type": "object",
+        "description": "Fornecedor",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 4
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome ou razão social",
+            "example": "Atacadão Irecê Ltda"
+          },
+          "cnpj": {
+            "type": "string",
+            "description": "CNPJ (só dígitos)",
+            "example": 12345678000190
+          },
+          "telefone": {
+            "type": "string",
+            "description": "Telefone de contato",
+            "example": "(74) 99999-0000"
+          },
+          "email": {
+            "type": "string",
+            "description": "E-mail de contato",
+            "example": "vendas@atacadao.com"
+          },
+          "ativo": {
+            "type": "boolean",
+            "description": "Se pode receber novas compras",
+            "example": true
+          },
+          "criadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora de cadastro"
+          }
+        }
+      },
+      "ItemVendaRequest": {
+        "type": "object",
+        "description": "Item de uma venda",
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Produto vendido",
+            "example": 12
+          },
+          "quantidade": {
+            "type": "number",
+            "description": "Quantidade; inteira para produtos vendidos por unidade",
+            "example": 2
+          }
+        },
+        "required": [
+          "produtoId",
+          "quantidade"
+        ]
+      },
+      "VendaRequest": {
+        "type": "object",
+        "description": "Registro de venda no caixa; o preço de cada item vem do cadastro do produto",
+        "properties": {
+          "formaPagamento": {
+            "type": "string",
+            "description": "Forma de pagamento",
+            "enum": [
+              "DINHEIRO",
+              "CARTAO_DEBITO",
+              "CARTAO_CREDITO",
+              "PIX"
+            ],
+            "example": "DINHEIRO"
+          },
+          "valorRecebido": {
+            "type": "number",
+            "description": "Valor entregue pelo cliente (só no pagamento em dinheiro); usado para calcular o troco",
+            "example": 50
+          },
+          "itens": {
+            "type": "array",
+            "description": "Itens vendidos",
+            "items": {
+              "$ref": "#/components/schemas/ItemVendaRequest"
+            },
+            "maxItems": 200,
+            "minItems": 0
+          }
+        },
+        "required": [
+          "formaPagamento",
+          "itens"
+        ]
+      },
+      "AjusteEstoqueRequest": {
+        "type": "object",
+        "description": "Ajuste manual de estoque (perda, avaria, vencimento, contagem de inventário...)",
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Produto ajustado",
+            "example": 12
+          },
+          "tipo": {
+            "type": "string",
+            "description": "ENTRADA soma ao estoque; SAIDA subtrai",
+            "enum": [
+              "ENTRADA",
+              "SAIDA"
+            ],
+            "example": "SAIDA"
+          },
+          "quantidade": {
+            "type": "number",
+            "description": "Quantidade movimentada; inteira para produtos vendidos por unidade",
+            "example": 3
+          },
+          "motivo": {
+            "type": "string",
+            "description": "Motivo do ajuste",
+            "example": "Embalagens avariadas no recebimento",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "motivo",
+          "produtoId",
+          "quantidade",
+          "tipo"
+        ]
+      },
+      "MovimentacaoEstoqueResponse": {
+        "type": "object",
+        "description": "Movimentação de estoque",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 105
+          },
+          "produtoId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Produto movimentado",
+            "example": 12
+          },
+          "produtoNome": {
+            "type": "string",
+            "description": "Nome do produto",
+            "example": "Arroz Tipo 1 5kg"
+          },
+          "tipo": {
+            "type": "string",
+            "description": "Entrada ou saída",
+            "enum": [
+              "ENTRADA",
+              "SAIDA"
+            ],
+            "example": "SAIDA"
+          },
+          "origem": {
+            "type": "string",
+            "description": "O que gerou a movimentação",
+            "enum": [
+              "AJUSTE",
+              "COMPRA",
+              "VENDA",
+              "ESTORNO_VENDA"
+            ],
+            "example": "AJUSTE"
+          },
+          "quantidade": {
+            "type": "number",
+            "description": "Quantidade movimentada",
+            "example": 3
+          },
+          "saldoApos": {
+            "type": "number",
+            "description": "Estoque do produto logo após a movimentação",
+            "example": 39
+          },
+          "motivo": {
+            "type": "string",
+            "description": "Motivo (obrigatório no ajuste manual)",
+            "example": "Embalagens avariadas no recebimento"
+          },
+          "referenciaId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Id da compra ou venda que gerou a movimentação",
+            "example": 48
+          },
+          "usuarioId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Usuário que fez a movimentação",
+            "example": 3
+          },
+          "criadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora da movimentação"
+          }
+        }
+      },
+      "UsuarioCreateRequest": {
+        "type": "object",
+        "description": "Dados para cadastro de usuário",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome completo",
+            "example": "Maria Souza",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "E-mail usado no login",
+            "example": "maria@mercado.com",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "senha": {
+            "type": "string",
+            "description": "Senha inicial: 8 a 72 caracteres, com letra e número",
+            "example": "Troque123",
+            "minLength": 1
+          },
+          "perfilIds": {
+            "type": "array",
+            "description": "Perfis (cargos) do usuário",
+            "example": [
+              3
+            ],
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "email",
+          "nome",
+          "perfilIds",
+          "senha"
+        ]
+      },
+      "CompraRequest": {
+        "type": "object",
+        "description": "Lançamento de compra de fornecedor; cada item dá entrada no estoque",
+        "properties": {
+          "fornecedorId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Fornecedor da compra",
+            "example": 4
+          },
+          "numeroNotaFiscal": {
+            "type": "string",
+            "description": "Número da nota fiscal",
+            "example": "000123456",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "observacao": {
+            "type": "string",
+            "description": "Observação livre",
+            "example": "Entrega parcial; restante na próxima semana",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "itens": {
+            "type": "array",
+            "description": "Itens comprados",
+            "items": {
+              "$ref": "#/components/schemas/ItemCompraRequest"
+            },
+            "maxItems": 200,
+            "minItems": 0
+          }
+        },
+        "required": [
+          "fornecedorId",
+          "itens"
+        ]
+      },
+      "ItemCompraRequest": {
+        "type": "object",
+        "description": "Item de uma compra",
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Produto comprado",
+            "example": 12
+          },
+          "quantidade": {
+            "type": "number",
+            "description": "Quantidade recebida; inteira para produtos vendidos por unidade",
+            "example": 24
+          },
+          "precoCustoUnitario": {
+            "type": "number",
+            "description": "Custo pago por unidade (ou por KG/L); vira o novo preço de custo do produto",
+            "example": 18.5
+          }
+        },
+        "required": [
+          "precoCustoUnitario",
+          "produtoId",
+          "quantidade"
+        ]
+      },
+      "CompraResponse": {
+        "type": "object",
+        "description": "Compra com seus itens",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 48
+          },
+          "fornecedorId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Fornecedor",
+            "example": 4
+          },
+          "fornecedorNome": {
+            "type": "string",
+            "description": "Nome do fornecedor",
+            "example": "Atacadão Irecê Ltda"
+          },
+          "numeroNotaFiscal": {
+            "type": "string",
+            "description": "Número da nota fiscal",
+            "example": "000123456"
+          },
+          "valorTotal": {
+            "type": "number",
+            "description": "Soma dos subtotais dos itens",
+            "example": 444
+          },
+          "observacao": {
+            "type": "string",
+            "description": "Observação livre"
+          },
+          "usuarioId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Usuário que lançou a compra",
+            "example": 3
+          },
+          "criadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora do lançamento"
+          },
+          "itens": {
+            "type": "array",
+            "description": "Itens da compra",
+            "items": {
+              "$ref": "#/components/schemas/ItemCompraResponse"
+            }
+          }
+        }
+      },
+      "ItemCompraResponse": {
+        "type": "object",
+        "description": "Item de uma compra",
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Produto",
+            "example": 12
+          },
+          "produtoNome": {
+            "type": "string",
+            "description": "Nome do produto",
+            "example": "Arroz Tipo 1 5kg"
+          },
+          "quantidade": {
+            "type": "number",
+            "description": "Quantidade recebida",
+            "example": 24
+          },
+          "precoCustoUnitario": {
+            "type": "number",
+            "description": "Custo por unidade",
+            "example": 18.5
+          },
+          "subtotal": {
+            "type": "number",
+            "description": "Quantidade x custo unitário",
+            "example": 444
+          }
+        }
+      },
+      "RefreshTokenRequest": {
+        "type": "object",
+        "description": "Refresh token recebido no login ou na última renovação",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token opaco",
+            "maxLength": 255,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "TokenResponse": {
+        "type": "object",
+        "description": "Par de tokens da sessão",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "description": "JWT para o header Authorization: Bearer"
+          },
+          "tokenType": {
+            "type": "string",
+            "description": "Tipo do token",
+            "example": "Bearer"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Validade do access token em segundos",
+            "example": 900
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Token opaco para renovar a sessão; de uso único"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "description": "Credenciais de acesso",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "E-mail do usuário",
+            "example": "admin@mercado.com",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "senha": {
+            "type": "string",
+            "description": "Senha",
+            "example": "SenhaForte1",
+            "maxLength": 72,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "email",
+          "senha"
+        ]
+      },
+      "PaginaResponseVendaResumoResponse": {
+        "type": "object",
+        "description": "Página de resultados",
+        "properties": {
+          "conteudo": {
+            "type": "array",
+            "description": "Itens da página",
+            "items": {
+              "$ref": "#/components/schemas/VendaResumoResponse"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Número da página (base 0)",
+            "example": 0
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tamanho da página",
+            "example": 20
+          },
+          "totalItens": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total de itens",
+            "example": 57
+          },
+          "totalPaginas": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total de páginas",
+            "example": 3
+          }
+        }
+      },
+      "VendaResumoResponse": {
+        "type": "object",
+        "description": "Venda na listagem (sem os itens)",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 305
+          },
+          "status": {
+            "type": "string",
+            "description": "Concluída ou cancelada",
+            "enum": [
+              "CONCLUIDA",
+              "CANCELADA"
+            ],
+            "example": "CONCLUIDA"
+          },
+          "formaPagamento": {
+            "type": "string",
+            "description": "Forma de pagamento",
+            "enum": [
+              "DINHEIRO",
+              "CARTAO_DEBITO",
+              "CARTAO_CREDITO",
+              "PIX"
+            ],
+            "example": "PIX"
+          },
+          "valorTotal": {
+            "type": "number",
+            "description": "Valor total",
+            "example": 47.8
+          },
+          "usuarioId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Usuário que registrou a venda",
+            "example": 3
+          },
+          "criadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora da venda"
+          }
+        }
+      },
+      "PaginaResponseProdutoResponse": {
+        "type": "object",
+        "description": "Página de resultados",
+        "properties": {
+          "conteudo": {
+            "type": "array",
+            "description": "Itens da página",
+            "items": {
+              "$ref": "#/components/schemas/ProdutoResponse"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Número da página (base 0)",
+            "example": 0
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tamanho da página",
+            "example": 20
+          },
+          "totalItens": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total de itens",
+            "example": 57
+          },
+          "totalPaginas": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total de páginas",
+            "example": 3
+          }
+        }
+      },
+      "PaginaResponseReposicaoResponse": {
+        "type": "object",
+        "description": "Página de resultados",
+        "properties": {
+          "conteudo": {
+            "type": "array",
+            "description": "Itens da página",
+            "items": {
+              "$ref": "#/components/schemas/ReposicaoResponse"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Número da página (base 0)",
+            "example": 0
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tamanho da página",
+            "example": 20
+          },
+          "totalItens": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total de itens",
+            "example": 57
+          },
+          "totalPaginas": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total de páginas",
+            "example": 3
+          }
+        }
+      },
+      "ReposicaoResponse": {
+        "type": "object",
+        "description": "Produto abaixo do estoque mínimo (alerta de reposição)",
+        "properties": {
+          "produtoId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Produto",
+            "example": 12
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome do produto",
+            "example": "Arroz Tipo 1 5kg"
+          },
+          "codigoBarras": {
+            "type": "string",
+            "description": "Código de barras",
+            "example": 7891234567890
+          },
+          "unidadeMedida": {
+            "type": "string",
+            "description": "Unidade de venda",
+            "enum": [
+              "UN",
+              "KG",
+              "L"
+            ],
+            "example": "UN"
+          },
+          "quantidadeEstoque": {
+            "type": "number",
+            "description": "Quantidade disponível",
+            "example": 4
+          },
+          "estoqueMinimo": {
+            "type": "number",
+            "description": "Estoque mínimo",
+            "example": 10
+          },
+          "quantidadeFaltante": {
+            "type": "number",
+            "description": "Quanto falta para chegar ao estoque mínimo",
+            "example": 6
+          }
+        }
+      },
+      "PaginaResponseMovimentacaoEstoqueResponse": {
+        "type": "object",
+        "description": "Página de resultados",
+        "properties": {
+          "conteudo": {
+            "type": "array",
+            "description": "Itens da página",
+            "items": {
+              "$ref": "#/components/schemas/MovimentacaoEstoqueResponse"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Número da página (base 0)",
+            "example": 0
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tamanho da página",
+            "example": 20
+          },
+          "totalItens": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total de itens",
+            "example": 57
+          },
+          "totalPaginas": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total de páginas",
+            "example": 3
+          }
+        }
+      },
+      "PaginaResponseUsuarioResponse": {
+        "type": "object",
+        "description": "Página de resultados",
+        "properties": {
+          "conteudo": {
+            "type": "array",
+            "description": "Itens da página",
+            "items": {
+              "$ref": "#/components/schemas/UsuarioResponse"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Número da página (base 0)",
+            "example": 0
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tamanho da página",
+            "example": 20
+          },
+          "totalItens": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total de itens",
+            "example": 57
+          },
+          "totalPaginas": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total de páginas",
+            "example": 3
+          }
+        }
+      },
+      "UsuarioLogadoResponse": {
+        "type": "object",
+        "description": "Dados do usuário autenticado, usados pelo front para montar menus e telas",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 7
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome completo",
+            "example": "Maria Souza"
+          },
+          "email": {
+            "type": "string",
+            "description": "E-mail de login",
+            "example": "maria@mercado.com"
+          },
+          "perfis": {
+            "type": "array",
+            "description": "Perfis (cargos) vinculados",
+            "items": {
+              "$ref": "#/components/schemas/PerfilResumoResponse"
+            }
+          },
+          "permissoes": {
+            "type": "array",
+            "description": "Permissões efetivas (somente de perfis ativos)",
+            "items": {
+              "type": "string",
+              "enum": [
+                "USUARIO_LISTAR",
+                "USUARIO_CRIAR",
+                "USUARIO_EDITAR",
+                "USUARIO_ALTERAR_STATUS",
+                "USUARIO_REDEFINIR_SENHA",
+                "PERFIL_LISTAR",
+                "PERFIL_CRIAR",
+                "PERFIL_EDITAR",
+                "PERFIL_ALTERAR_STATUS",
+                "PERMISSAO_LISTAR",
+                "VENDA_LISTAR",
+                "VENDA_REGISTRAR",
+                "VENDA_CANCELAR",
+                "PRODUTO_LISTAR",
+                "PRODUTO_GERENCIAR",
+                "ESTOQUE_LISTAR",
+                "ESTOQUE_AJUSTAR",
+                "COMPRA_LISTAR",
+                "COMPRA_REGISTRAR",
+                "RELATORIO_VISUALIZAR"
+              ]
+            }
+          }
+        }
+      },
+      "PermissaoResponse": {
+        "type": "object",
+        "description": "Permissão do catálogo",
+        "properties": {
+          "codigo": {
+            "type": "string",
+            "description": "Código usado como authority",
+            "example": "USUARIO_LISTAR"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição legível",
+            "example": "Listar e consultar usuários"
+          },
+          "grupo": {
+            "type": "string",
+            "description": "Agrupamento para exibição na tela de perfis",
+            "example": "Usuários"
+          }
+        }
+      },
+      "PaginaResponseFornecedorResponse": {
+        "type": "object",
+        "description": "Página de resultados",
+        "properties": {
+          "conteudo": {
+            "type": "array",
+            "description": "Itens da página",
+            "items": {
+              "$ref": "#/components/schemas/FornecedorResponse"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Número da página (base 0)",
+            "example": 0
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tamanho da página",
+            "example": 20
+          },
+          "totalItens": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total de itens",
+            "example": 57
+          },
+          "totalPaginas": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total de páginas",
+            "example": 3
+          }
+        }
+      },
+      "CompraResumoResponse": {
+        "type": "object",
+        "description": "Compra na listagem (sem os itens)",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador",
+            "example": 48
+          },
+          "fornecedorId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Fornecedor",
+            "example": 4
+          },
+          "fornecedorNome": {
+            "type": "string",
+            "description": "Nome do fornecedor",
+            "example": "Atacadão Irecê Ltda"
+          },
+          "numeroNotaFiscal": {
+            "type": "string",
+            "description": "Número da nota fiscal",
+            "example": "000123456"
+          },
+          "valorTotal": {
+            "type": "number",
+            "description": "Valor total",
+            "example": 444
+          },
+          "usuarioId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Usuário que lançou a compra",
+            "example": 3
+          },
+          "criadoEm": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora do lançamento"
+          }
+        }
+      },
+      "PaginaResponseCompraResumoResponse": {
+        "type": "object",
+        "description": "Página de resultados",
+        "properties": {
+          "conteudo": {
+            "type": "array",
+            "description": "Itens da página",
+            "items": {
+              "$ref": "#/components/schemas/CompraResumoResponse"
+            }
+          },
+          "pagina": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Número da página (base 0)",
+            "example": 0
+          },
+          "tamanho": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tamanho da página",
+            "example": 20
+          },
+          "totalItens": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total de itens",
+            "example": 57
+          },
+          "totalPaginas": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total de páginas",
+            "example": 3
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
