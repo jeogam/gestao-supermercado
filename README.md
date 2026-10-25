@@ -63,6 +63,25 @@ Para Compras e Vendas, a regra acima fica assim: **não** chame `Produto.addEsto
 `MovimentacaoEstoqueService.saveMovimentacao(produtoId, tipo, quantidade, origem, referenciaId, usuarioId)` dentro da
 transação da compra/venda, passando o id dela em `referenciaId`. Assim toda mudança de estoque fica no histórico.
 
+### Compras (`modules/compra`)
+
+| Subdomínio   | Responsabilidade |
+|--------------|------------------|
+| `fornecedor` | Cadastro de fornecedores (`/api/v1/compra/fornecedores`): nome, CNPJ opcional e único, contato, ativo/inativo |
+| `compra`     | Lançamento e consulta de compras com itens (`/api/v1/compra/compras`) |
+
+Consulta exige `COMPRA_LISTAR`; lançar compra e cadastrar/editar fornecedor exigem `COMPRA_REGISTRAR`. O CNPJ é
+aceito com ou sem pontuação e guardado só com os dígitos. Fornecedor não é excluído, só inativado.
+
+Ao lançar uma compra, na mesma transação:
+
+- cada item dá entrada no estoque (movimentação de origem `COMPRA` com `referenciaId` = id da compra);
+- o `precoCusto` do produto passa a ser o custo unitário pago nesta compra (base da margem nos relatórios).
+
+Se qualquer item falhar (produto inexistente ou inativo, quantidade fracionada em produto `UN`, produto repetido na
+mesma compra), nada é gravado. A compra é imutável depois de registrada: erro de lançamento se corrige com ajuste de
+estoque.
+
 ### Perfis
 
 | Perfil | Pode fazer |
