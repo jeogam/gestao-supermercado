@@ -95,6 +95,20 @@ class MovimentacaoEstoqueServiceImplTest {
     }
 
     @Test
+    void shouldAcceptProdutoInativoOnlyForEstornoVenda() {
+        final Produto produto = newProduto(BigDecimal.ONE);
+        produto.setAtivo(false);
+        when(produtoService.findProdutoForEstorno(PRODUTO_ID)).thenReturn(produto);
+        when(movimentacaoEstoqueRepository.save(any())).then(AdditionalAnswers.returnsFirstArg());
+
+        final MovimentacaoEstoque movimentacao = movimentacaoEstoqueService.saveMovimentacao(PRODUTO_ID, TipoMovimentacao.ENTRADA,
+                new BigDecimal("2"), OrigemMovimentacao.ESTORNO_VENDA, 48L, USUARIO_ID);
+
+        assertThat(movimentacao.getSaldoApos()).isEqualByComparingTo("3");
+        verify(produtoService, never()).findProdutoAtivoForMovimentacao(any());
+    }
+
+    @Test
     void shouldPropagateProdutoInativo() {
         when(produtoService.findProdutoAtivoForMovimentacao(PRODUTO_ID))
                 .thenThrow(BusinessException.unprocessable(ErrorMessage.PRODUTO_INATIVO));
