@@ -82,6 +82,21 @@ Se qualquer item falhar (produto inexistente ou inativo, quantidade fracionada e
 mesma compra), nada é gravado. A compra é imutável depois de registrada: erro de lançamento se corrige com ajuste de
 estoque.
 
+### Vendas (`modules/venda`)
+
+Registro, consulta e cancelamento de vendas do caixa (`/api/v1/venda/vendas`). Consulta exige `VENDA_LISTAR`, registrar
+exige `VENDA_REGISTRAR` e cancelar exige `VENDA_CANCELAR` (o Caixa tem as três, ver ADR-001).
+
+- **Registrar** (`POST /venda`): itens com produto e quantidade; o preço vem do cadastro do produto, o caixa não o
+  digita. Cada item dá baixa no estoque (origem `VENDA`); se faltar estoque de qualquer item, nada é gravado.
+- **Pagamento**: `DINHEIRO`, `CARTAO_DEBITO`, `CARTAO_CREDITO` ou `PIX`. No dinheiro, `valorRecebido` é opcional; se
+  informado, o troco é calculado e valor menor que o total é recusado.
+- **Cancelar / desfazer** (`PUT /venda/{id}/cancelamento`, motivo opcional): a venda fica `CANCELADA`, com quem
+  cancelou e quando, e os itens voltam ao estoque (origem `ESTORNO_VENDA`), mesmo que o produto tenha sido inativado
+  depois. Uma venda não pode ser cancelada duas vezes. O mesmo endpoint serve para o "Desfazer" logo após a venda.
+- Cada item guarda o preço e o **custo do momento da venda**, para os relatórios de margem não mudarem com reajustes
+  posteriores. O custo nunca aparece nas respostas de venda.
+
 ### Perfis
 
 | Perfil | Pode fazer |
