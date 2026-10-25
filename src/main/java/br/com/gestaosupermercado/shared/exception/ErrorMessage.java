@@ -37,7 +37,14 @@ public enum ErrorMessage {
 
     MOVIMENTACAO_NAO_ENCONTRADA("Movimentação de estoque não encontrada."),
     MOTIVO_AJUSTE_OBRIGATORIO("Informe o motivo do ajuste de estoque."),
-    PERIODO_INVALIDO("A data inicial deve ser anterior ou igual à data final.");
+    PERIODO_INVALIDO("A data inicial deve ser anterior ou igual à data final."),
+
+    FORNECEDOR_NAO_ENCONTRADO("Fornecedor não encontrado."),
+    FORNECEDOR_INATIVO("O fornecedor está inativo."),
+    CNPJ_JA_CADASTRADO("Já existe um fornecedor cadastrado com este CNPJ."),
+
+    COMPRA_NAO_ENCONTRADA("Compra não encontrada."),
+    PRODUTO_REPETIDO_NA_COMPRA("O mesmo produto aparece mais de uma vez na compra. Junte as quantidades em um único item.");
 
     private final String descricao;
 }
