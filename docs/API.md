@@ -77,10 +77,11 @@ Authorization: Bearer <accessToken>
 | `200` | Consulta ou edição com corpo de resposta |
 | `201` | Criação (corpo traz o recurso criado) |
 | `204` | Operação sem corpo (troca de status, senha, logout) |
-| `400` | JSON malformado ou valor de enum inexistente (`"Corpo da requisição inválido."`) |
+| `400` | JSON malformado ou valor de enum inexistente (`"Corpo da requisição inválido."`); parâmetro de rota/query com tipo errado (ex.: id `abc`) |
 | `401` | Não autenticado / sessão expirada / credenciais inválidas no login |
 | `403` | Autenticado, mas sem a permissão exigida |
 | `404` | Recurso (ou recurso referenciado no corpo, como `produtoId`) não existe |
+| `405` / `415` | Método HTTP errado na rota / corpo sem `application/json` |
 | `409` | Conflito: valor único repetido (e-mail, código de barras, CNPJ, nome de perfil) ou registro alterado ao mesmo tempo por outra operação — **ofereça "tentar de novo"** |
 | `422` | Validação de campos ou regra de negócio (estoque insuficiente, produto inativo...) |
 | `500` | Erro inesperado; detalhes só no log do servidor |
