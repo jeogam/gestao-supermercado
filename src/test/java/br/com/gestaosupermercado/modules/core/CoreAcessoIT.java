@@ -67,11 +67,11 @@ class CoreAcessoIT {
         @Test
         void shouldAllowCorsPreflightOnlyFromConfiguredOrigin() throws Exception {
                 mockMvc.perform(options("/api/v1/auth/login")
-                                .header(HttpHeaders.ORIGIN, "http://localhost:5173")
+                                .header(HttpHeaders.ORIGIN, "http://localhost:3000")
                                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST"))
                                 .andExpect(status().isOk())
                                 .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
-                                                "http://localhost:5173"));
+                                                "http://localhost:3000"));
                 mockMvc.perform(options("/api/v1/auth/login")
                                 .header(HttpHeaders.ORIGIN, "https://site-malicioso.com")
                                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "POST"))

@@ -67,8 +67,9 @@ Authorization: Bearer <accessToken>
 - Corpo sempre `Content-Type: application/json` em **UTF-8**.
 - Texto é aparado (`strip`) pelo backend; strings opcionais em branco viram `null`.
 - E-mails são guardados em minúsculas.
-- **CORS:** só as origens em `CORS_ALLOWED_ORIGINS` (padrão `http://localhost:5173`, separadas por vírgula) podem
-  chamar a API pelo navegador. Em produção, defina a URL do front publicado.
+- **CORS:** só as origens em `CORS_ALLOWED_ORIGINS` (padrão `http://localhost:3000`, separadas por vírgula) podem
+  chamar a API pelo navegador. Em produção, defina a URL do front publicado. Isso vale também quando o front repassa
+  `/api/*` pelo próprio servidor (rewrite do Next): o cabeçalho `Origin` do navegador chega à API do mesmo jeito.
 
 ### Status HTTP
 

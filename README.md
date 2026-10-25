@@ -132,7 +132,7 @@ A aplicação não sobe se o enum e a tabela `permissao` estiverem diferentes (`
 Pré-requisitos: JDK 21+ e Docker.
 
 1. Copie `.env.example` para `.env` e preencha `DB_PASSWORD`, `JWT_SECRET`, `ADMIN_EMAIL` e `ADMIN_SENHA`.
-   `CORS_ALLOWED_ORIGINS` define quais fronts podem chamar a API (padrão `http://localhost:5173`).
+   `CORS_ALLOWED_ORIGINS` define quais fronts podem chamar a API (padrão `http://localhost:3000`).
 2. Suba o banco: `docker compose up -d db`
 3. Rode a API: `./mvnw spring-boot:run`
 
