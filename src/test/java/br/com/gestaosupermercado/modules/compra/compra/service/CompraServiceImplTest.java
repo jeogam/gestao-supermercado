@@ -97,6 +97,17 @@ class CompraServiceImplTest {
     }
 
     @Test
+    void shouldValidateProdutosBeforeSavingCompra() {
+        when(fornecedorService.findFornecedorAtivoForCompra(4L)).thenReturn(new Fornecedor("Atacadão", null, null, null));
+        when(produtoService.findProdutoAtivoForMovimentacao(999L)).thenThrow(BusinessException.notFound(ErrorMessage.PRODUTO_NAO_ENCONTRADO));
+
+        assertThatThrownBy(() -> compraService.saveCompra(new CompraRequest(4L, null, null,
+                List.of(new ItemCompraRequest(999L, BigDecimal.ONE, BigDecimal.TEN))), USUARIO_ID))
+                .hasMessage(ErrorMessage.PRODUTO_NAO_ENCONTRADO.getDescricao());
+        verifyNoInteractions(compraRepository, movimentacaoEstoqueService);
+    }
+
+    @Test
     void shouldRejectProdutoRepetidoBeforeSaving() {
         when(fornecedorService.findFornecedorAtivoForCompra(4L)).thenReturn(new Fornecedor("Atacadão", null, null, null));
 

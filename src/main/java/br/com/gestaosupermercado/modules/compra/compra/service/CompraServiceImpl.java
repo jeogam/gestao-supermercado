@@ -73,6 +73,8 @@ public class CompraServiceImpl implements CompraService {
         for (final ItemCompraRequest item : request.itens()) {
             compra.addItem(item.produtoId(), item.quantidade(), item.precoCustoUnitario());
         }
+        // Valida os produtos antes de gravar: um id inexistente responderia 404, e não erro de chave estrangeira.
+        compra.getItens().forEach(item -> produtoService.findProdutoAtivoForMovimentacao(item.getProdutoId()));
         // Salva antes de movimentar: o histórico de estoque guarda o id da compra.
         compraRepository.save(compra);
         for (final ItemCompra item : compra.getItens()) {

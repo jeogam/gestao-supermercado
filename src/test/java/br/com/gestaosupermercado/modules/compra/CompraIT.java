@@ -181,6 +181,14 @@ class CompraIT {
                 {"produtoId": %d, "quantidade": 1, "precoCustoUnitario": 5.00}
                 """.formatted(produtoId))
                 .andExpect(status().isNotFound());
+        saveCompra(estoquistaToken, fornecedorId, null, """
+                {"produtoId": %d, "quantidade": 1, "precoCustoUnitario": 5.00},
+                {"produtoId": 999999, "quantidade": 1, "precoCustoUnitario": 5.00}
+                """.formatted(produtoId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensagem").value("Produto não encontrado."));
+        mockMvc.perform(get("/api/v1/produto/produtos/produto/{id}", produtoId).header(HttpHeaders.AUTHORIZATION, bearer(estoquistaToken)))
+                .andExpect(jsonPath("$.quantidadeEstoque").value(0));
 
         mockMvc.perform(put("/api/v1/compra/fornecedores/fornecedor/{id}/status", fornecedorId)
                         .header(HttpHeaders.AUTHORIZATION, bearer(estoquistaToken))
