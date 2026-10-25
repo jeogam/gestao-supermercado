@@ -44,7 +44,12 @@ public enum ErrorMessage {
     CNPJ_JA_CADASTRADO("Já existe um fornecedor cadastrado com este CNPJ."),
 
     COMPRA_NAO_ENCONTRADA("Compra não encontrada."),
-    PRODUTO_REPETIDO_NA_COMPRA("O mesmo produto aparece mais de uma vez na compra. Junte as quantidades em um único item.");
+    PRODUTO_REPETIDO_NA_COMPRA("O mesmo produto aparece mais de uma vez na compra. Junte as quantidades em um único item."),
+
+    VENDA_NAO_ENCONTRADA("Venda não encontrada."),
+    VENDA_JA_CANCELADA("A venda já está cancelada."),
+    PRODUTO_REPETIDO_NA_VENDA("O mesmo produto aparece mais de uma vez na venda. Junte as quantidades em um único item."),
+    VALOR_RECEBIDO_INSUFICIENTE("O valor recebido é menor que o total da venda.");
 
     private final String descricao;
 }
