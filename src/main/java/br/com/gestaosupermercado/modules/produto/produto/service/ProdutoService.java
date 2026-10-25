@@ -30,6 +30,12 @@ public interface ProdutoService {
     Produto findProdutoAtivoForMovimentacao(Long id);
 
     /**
+     * Como {@link #findProdutoAtivoForMovimentacao}, mas aceita produto inativo: devolver ao estoque o que saiu numa
+     * venda cancelada não depende de o produto ainda estar à venda.
+     */
+    Produto findProdutoForEstorno(Long id);
+
+    /**
      * Nome de cada produto por id, para as listagens de outros módulos que guardam só o id do produto.
      * Ids inexistentes ficam fora do mapa.
      */

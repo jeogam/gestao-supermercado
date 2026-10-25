@@ -118,7 +118,7 @@ public class Venda {
         this.troco = valorRecebido.subtract(valorTotal);
     }
 
-    public void cancelar(final Long usuarioId, final String motivo, final OffsetDateTime agora) {
+    public void cancel(final Long usuarioId, final String motivo, final OffsetDateTime agora) {
         if (status == StatusVenda.CANCELADA) {
             throw BusinessException.unprocessable(ErrorMessage.VENDA_JA_CANCELADA);
         }

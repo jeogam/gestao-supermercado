@@ -81,7 +81,9 @@ public class MovimentacaoEstoqueServiceImpl implements MovimentacaoEstoqueServic
     @Transactional(propagation = Propagation.MANDATORY)
     public MovimentacaoEstoque saveMovimentacao(final Long produtoId, final TipoMovimentacao tipo, final BigDecimal quantidade,
                                                 final OrigemMovimentacao origem, final Long referenciaId, final Long usuarioId) {
-        final Produto produto = produtoService.findProdutoAtivoForMovimentacao(produtoId);
+        final Produto produto = origem == OrigemMovimentacao.ESTORNO_VENDA
+                ? produtoService.findProdutoForEstorno(produtoId)
+                : produtoService.findProdutoAtivoForMovimentacao(produtoId);
         return movimentar(produto, tipo, quantidade, origem, null, referenciaId, usuarioId);
     }
 

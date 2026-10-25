@@ -21,8 +21,8 @@ public interface MovimentacaoEstoqueService {
     /**
      * Ponto de entrada para Compras e Vendas: movimenta o estoque do produto e registra o histórico na
      * transação de quem chama, para que a compra/venda e o estoque sejam gravados juntos ou nenhum dos dois.
-     * Falha se o produto não existir ou estiver inativo, se o estoque ficar negativo, ou se for chamado fora
-     * de uma transação.
+     * Falha se o produto não existir ou estiver inativo (exceto no {@code ESTORNO_VENDA}), se o estoque ficar negativo,
+     * ou se for chamado fora de uma transação.
      *
      * @param referenciaId id da compra ou venda que gerou a movimentação
      */

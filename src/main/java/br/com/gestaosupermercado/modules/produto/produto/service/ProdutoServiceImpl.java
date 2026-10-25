@@ -101,6 +101,12 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public Produto findProdutoForEstorno(final Long id) {
+        return findProdutoEntityById(id);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Map<Long, String> findNomesProdutosByIds(final Collection<Long> ids) {
         if (ids.isEmpty()) {
