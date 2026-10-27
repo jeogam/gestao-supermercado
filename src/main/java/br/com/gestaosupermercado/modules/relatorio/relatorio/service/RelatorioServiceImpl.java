@@ -11,24 +11,10 @@ import br.com.gestaosupermercado.modules.relatorio.relatorio.repository.projecti
 import br.com.gestaosupermercado.modules.venda.venda.enums.StatusVenda;
 import br.com.gestaosupermercado.shared.exception.BusinessException;
 import br.com.gestaosupermercado.shared.exception.ErrorMessage;
-import com.lowagie.text.Document;
-import com.lowagie.text.Element;
-import com.lowagie.text.Font;
-import com.lowagie.text.FontFactory;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Phrase;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
-import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,8 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class RelatorioServiceImpl implements RelatorioService {
 
     private static final BigDecimal CEM = BigDecimal.valueOf(100);
-    private static final Locale PT_BR = Locale.of("pt", "BR");
-    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final RelatorioRepository relatorioRepository;
     private final ProdutoService produtoService;
@@ -82,55 +66,7 @@ public class RelatorioServiceImpl implements RelatorioService {
         final List<MargemProdutoResponse> produtos = findMargemProdutos(filtro);
         final FaturamentoResponse faturamento = toFaturamentoResponse(filtro,
                 produtos.stream().map(MargemProdutoResponse::custo).reduce(BigDecimal.ZERO, BigDecimal::add));
-        final NumberFormat moeda = NumberFormat.getCurrencyInstance(PT_BR);
-        final Font titulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
-        final Font subtitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
-        final Font texto = FontFactory.getFont(FontFactory.HELVETICA, 10);
-        final Font cabecalho = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10);
-
-        final ByteArrayOutputStream saida = new ByteArrayOutputStream();
-        final Document documento = new Document(PageSize.A4, 36, 36, 36, 36);
-        PdfWriter.getInstance(documento, saida);
-        documento.open();
-        documento.add(new Paragraph("Relatório de vendas", titulo));
-        documento.add(new Paragraph("Período: %s a %s".formatted(filtro.dataInicio().format(FORMATO_DATA), filtro.dataFim().format(FORMATO_DATA)),
-                texto));
-        documento.add(new Paragraph(" "));
-
-        documento.add(new Paragraph("Resumo", subtitulo));
-        final PdfPTable resumo = new PdfPTable(2);
-        resumo.setWidthPercentage(60);
-        resumo.setHorizontalAlignment(Element.ALIGN_LEFT);
-        addLinha(resumo, texto, "Vendas concluídas", String.valueOf(faturamento.quantidadeVendas()));
-        addLinha(resumo, texto, "Vendas canceladas", String.valueOf(faturamento.quantidadeVendasCanceladas()));
-        addLinha(resumo, texto, "Faturamento", moeda.format(faturamento.faturamento()));
-        addLinha(resumo, texto, "Custo", moeda.format(faturamento.custo()));
-        addLinha(resumo, texto, "Lucro", moeda.format(faturamento.lucro()));
-        addLinha(resumo, texto, "Margem", faturamento.margemPercentual() + "%");
-        faturamento.formasPagamento().forEach(forma -> addLinha(resumo, texto, "  " + forma.formaPagamento(),
-                "%d venda(s) · %s".formatted(forma.quantidadeVendas(), moeda.format(forma.faturamento()))));
-        documento.add(resumo);
-        documento.add(new Paragraph(" "));
-
-        documento.add(new Paragraph("Margem por produto", subtitulo));
-        final PdfPTable tabela = new PdfPTable(new float[]{4, 1.4f, 1.6f, 1.6f, 1.6f, 1.2f});
-        tabela.setWidthPercentage(100);
-        tabela.setHeaderRows(1);
-        for (final String coluna : List.of("Produto", "Qtd.", "Faturamento", "Custo", "Lucro", "Margem")) {
-            tabela.addCell(new PdfPCell(new Phrase(coluna, cabecalho)));
-        }
-        for (final MargemProdutoResponse produto : produtos) {
-            tabela.addCell(new Phrase(produto.nome(), texto));
-            final String unidade = produto.unidadeMedida() == null ? "" : " " + produto.unidadeMedida().name().toLowerCase();
-            addNumero(tabela, texto, produto.quantidadeVendida().stripTrailingZeros().toPlainString() + unidade);
-            addNumero(tabela, texto, moeda.format(produto.faturamento()));
-            addNumero(tabela, texto, moeda.format(produto.custo()));
-            addNumero(tabela, texto, moeda.format(produto.lucro()));
-            addNumero(tabela, texto, produto.margemPercentual() + "%");
-        }
-        documento.add(tabela);
-        documento.close();
-        return saida.toByteArray();
+        return RelatorioPdf.gerar(filtro, faturamento, produtos);
     }
 
     private FaturamentoResponse toFaturamentoResponse(final RelatorioFiltroRequest filtro, final BigDecimal custo) {
@@ -170,16 +106,5 @@ public class RelatorioServiceImpl implements RelatorioService {
             return BigDecimal.ZERO.setScale(2);
         }
         return lucro.multiply(CEM).divide(faturamento, 2, RoundingMode.HALF_EVEN);
-    }
-
-    private static void addLinha(final PdfPTable tabela, final Font fonte, final String rotulo, final String valor) {
-        tabela.addCell(new Phrase(rotulo, fonte));
-        addNumero(tabela, fonte, valor);
-    }
-
-    private static void addNumero(final PdfPTable tabela, final Font fonte, final String valor) {
-        final PdfPCell celula = new PdfPCell(new Phrase(valor, fonte));
-        celula.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        tabela.addCell(celula);
     }
 }
