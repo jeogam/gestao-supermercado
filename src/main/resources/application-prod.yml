@@ -1,11 +1,11 @@
-# Perfil de produção, pensado para hospedagem gratuita (pouca memória, banco remoto que hiberna).
+# Perfil de produção, pensado para hospedagem gratuita (pouca memória, banco remoto com poucas conexões).
 spring:
   datasource:
     hikari:
       # Plano gratuito de banco aceita poucas conexões; poucas conexões também economizam memória.
       maximum-pool-size: 5
       minimum-idle: 1
-      # Banco serverless (ex.: Neon) pode levar alguns segundos para acordar.
+      # Banco remoto via pooler: tolera a demora de conexão logo após um deploy ou instabilidade de rede.
       connection-timeout: 20000
   jpa:
     properties:

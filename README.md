@@ -143,7 +143,7 @@ Para subir banco e API juntos em containers (como em um servidor): `docker compo
 
 ## Deploy
 
-Passo a passo para publicar de graça (Render + Neon) em [docs/DEPLOY.md](docs/DEPLOY.md).
+Passo a passo para publicar de graça (Render + Supabase) em [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Testes
 

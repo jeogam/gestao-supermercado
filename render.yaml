@@ -1,5 +1,5 @@
-# Blueprint do Render (plano gratuito). O banco fica fora do Render (Neon), porque o Postgres gratuito
-# do Render é apagado 30 dias após a criação.
+# Blueprint do Render (plano gratuito). O banco e os arquivos ficam fora do Render (Supabase), porque o
+# Postgres gratuito do Render é apagado 30 dias após a criação e o disco do serviço grátis não é persistente.
 services:
   - type: web
     name: gestao-supermercado-api

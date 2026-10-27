@@ -49,10 +49,14 @@ management:
   endpoint:
     health:
       show-details: never
-      # /actuator/health/liveness não toca o banco: é o alvo do ping que impede a hospedagem de dormir
-      # sem manter um banco serverless acordado (o que consumiria a cota gratuita dele).
+      # liveness: só o processo (o Render reinicia a API se falhar; não pode depender do banco).
+      # readiness: inclui o banco. É o alvo do ping externo, que mantém a API e o banco (Supabase pausa
+      # o projeto grátis após 7 dias sem uso) ativos.
       probes:
         enabled: true
+      group:
+        readiness:
+          include: readinessState,db
 
 springdoc:
   swagger-ui:
