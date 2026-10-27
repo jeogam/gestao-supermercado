@@ -42,6 +42,12 @@ public interface ProdutoService {
     Map<Long, String> findNomesProdutosByIds(Collection<Long> ids);
 
     /**
+     * Produto por id, para listagens que mostram mais que o nome (ex.: unidade de medida junto da quantidade).
+     * Ids inexistentes ficam fora do mapa.
+     */
+    Map<Long, Produto> findProdutosByIds(Collection<Long> ids);
+
+    /**
      * Atualiza o preço de custo com o valor pago na compra mais recente, base da margem nos relatórios.
      * Chamado pelo módulo de compras dentro da transação da compra.
      */

@@ -1,5 +1,6 @@
 package br.com.gestaosupermercado.modules.relatorio.relatorio.service;
 
+import br.com.gestaosupermercado.modules.produto.produto.model.Produto;
 import br.com.gestaosupermercado.modules.produto.produto.service.ProdutoService;
 import br.com.gestaosupermercado.modules.relatorio.relatorio.dto.request.RelatorioFiltroRequest;
 import br.com.gestaosupermercado.modules.relatorio.relatorio.dto.response.FaturamentoFormaPagamentoResponse;
@@ -67,9 +68,9 @@ public class RelatorioServiceImpl implements RelatorioService {
     public List<MargemProdutoResponse> findMargemProdutos(final RelatorioFiltroRequest filtro) {
         ensurePeriodoValido(filtro);
         final List<TotalProduto> totais = relatorioRepository.sumItensByProduto(StatusVenda.CONCLUIDA, filtro.dataInicio(), filtro.dataFim());
-        final Map<Long, String> nomesProdutos = produtoService.findNomesProdutosByIds(totais.stream().map(TotalProduto::produtoId).toList());
+        final Map<Long, Produto> produtos = produtoService.findProdutosByIds(totais.stream().map(TotalProduto::produtoId).toList());
         return totais.stream()
-                .map(total -> toMargemProdutoResponse(total, nomesProdutos.get(total.produtoId())))
+                .map(total -> toMargemProdutoResponse(total, produtos.get(total.produtoId())))
                 .sorted(Comparator.comparing(MargemProdutoResponse::lucro).reversed().thenComparing(MargemProdutoResponse::produtoId))
                 .toList();
     }
@@ -120,7 +121,8 @@ public class RelatorioServiceImpl implements RelatorioService {
         }
         for (final MargemProdutoResponse produto : produtos) {
             tabela.addCell(new Phrase(produto.nome(), texto));
-            addNumero(tabela, texto, produto.quantidadeVendida().stripTrailingZeros().toPlainString());
+            final String unidade = produto.unidadeMedida() == null ? "" : " " + produto.unidadeMedida().name().toLowerCase();
+            addNumero(tabela, texto, produto.quantidadeVendida().stripTrailingZeros().toPlainString() + unidade);
             addNumero(tabela, texto, moeda.format(produto.faturamento()));
             addNumero(tabela, texto, moeda.format(produto.custo()));
             addNumero(tabela, texto, moeda.format(produto.lucro()));
@@ -151,10 +153,11 @@ public class RelatorioServiceImpl implements RelatorioService {
         }
     }
 
-    private static MargemProdutoResponse toMargemProdutoResponse(final TotalProduto total, final String nome) {
+    private static MargemProdutoResponse toMargemProdutoResponse(final TotalProduto total, final Produto produto) {
         final BigDecimal custo = toCentavos(total.custo());
         final BigDecimal lucro = total.faturamento().subtract(custo);
-        return new MargemProdutoResponse(total.produtoId(), nome, total.quantidadeVendida(), total.faturamento(), custo, lucro,
+        return new MargemProdutoResponse(total.produtoId(), produto == null ? null : produto.getNome(),
+                produto == null ? null : produto.getUnidadeMedida(), total.quantidadeVendida(), total.faturamento(), custo, lucro,
                 toMargemPercentual(lucro, total.faturamento()));
     }
 

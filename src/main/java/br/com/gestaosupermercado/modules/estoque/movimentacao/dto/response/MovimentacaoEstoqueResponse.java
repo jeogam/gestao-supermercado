@@ -2,6 +2,7 @@ package br.com.gestaosupermercado.modules.estoque.movimentacao.dto.response;
 
 import br.com.gestaosupermercado.modules.estoque.movimentacao.enums.OrigemMovimentacao;
 import br.com.gestaosupermercado.modules.estoque.movimentacao.enums.TipoMovimentacao;
+import br.com.gestaosupermercado.modules.produto.produto.enums.UnidadeMedida;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -16,6 +17,9 @@ public record MovimentacaoEstoqueResponse(
 
         @Schema(description = "Nome do produto", example = "Arroz Tipo 1 5kg")
         String produtoNome,
+
+        @Schema(description = "Unidade do produto, para exibir a quantidade (3 un, 0,5 kg)", example = "UN")
+        UnidadeMedida unidadeMedida,
 
         @Schema(description = "Entrada ou saída", example = "SAIDA")
         TipoMovimentacao tipo,

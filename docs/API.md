@@ -325,7 +325,7 @@ Regras:
 { "produtoId": 12, "tipo": "SAIDA", "quantidade": 3, "motivo": "Embalagens avariadas no recebimento" }
 
 // MovimentacaoEstoqueResponse
-{ "id": 105, "produtoId": 12, "produtoNome": "Arroz Tipo 1 5kg", "tipo": "SAIDA", "origem": "AJUSTE",
+{ "id": 105, "produtoId": 12, "produtoNome": "Arroz Tipo 1 5kg", "unidadeMedida": "UN", "tipo": "SAIDA", "origem": "AJUSTE",
   "quantidade": 3.000, "saldoApos": 39.000, "motivo": "Embalagens avariadas no recebimento",
   "referenciaId": null,   // id da compra (origem COMPRA) ou da venda (VENDA / ESTORNO_VENDA)
   "usuarioId": 3, "criadoEm": "2026-10-24T18:23:50.927Z" }
@@ -468,7 +468,7 @@ Só vendas `CONCLUIDA` entram nos valores; o custo é o guardado em cada item no
   "formasPagamento": [ { "formaPagamento": "PIX", "quantidadeVendas": 42, "faturamento": 1530.40 } ] }
 
 // MargemProdutoResponse
-{ "produtoId": 12, "nome": "Arroz Tipo 1 5kg", "quantidadeVendida": 35,
+{ "produtoId": 12, "nome": "Arroz Tipo 1 5kg", "unidadeMedida": "UN", "quantidadeVendida": 35,
   "faturamento": 836.50, "custo": 630.00, "lucro": 206.50, "margemPercentual": 24.69 }
 ```
 

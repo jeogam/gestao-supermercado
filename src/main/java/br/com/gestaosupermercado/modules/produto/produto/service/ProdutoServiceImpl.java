@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -109,11 +110,18 @@ public class ProdutoServiceImpl implements ProdutoService {
     @Override
     @Transactional(readOnly = true)
     public Map<Long, String> findNomesProdutosByIds(final Collection<Long> ids) {
+        return findProdutosByIds(ids).values().stream()
+                .collect(Collectors.toMap(Produto::getId, Produto::getNome));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Produto> findProdutosByIds(final Collection<Long> ids) {
         if (ids.isEmpty()) {
             return Map.of();
         }
         return produtoRepository.findAllById(ids).stream()
-                .collect(Collectors.toMap(Produto::getId, Produto::getNome));
+                .collect(Collectors.toMap(Produto::getId, Function.identity()));
     }
 
     @Override

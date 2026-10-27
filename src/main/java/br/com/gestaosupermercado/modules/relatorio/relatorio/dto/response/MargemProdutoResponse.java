@@ -1,5 +1,6 @@
 package br.com.gestaosupermercado.modules.relatorio.relatorio.dto.response;
 
+import br.com.gestaosupermercado.modules.produto.produto.enums.UnidadeMedida;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
@@ -10,6 +11,9 @@ public record MargemProdutoResponse(
 
         @Schema(description = "Nome do produto", example = "Arroz Tipo 1 5kg")
         String nome,
+
+        @Schema(description = "Unidade do produto, para exibir a quantidade vendida", example = "UN")
+        UnidadeMedida unidadeMedida,
 
         @Schema(description = "Quantidade vendida", example = "35")
         BigDecimal quantidadeVendida,

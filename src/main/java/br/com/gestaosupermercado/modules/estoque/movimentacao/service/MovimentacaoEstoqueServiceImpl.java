@@ -50,12 +50,12 @@ public class MovimentacaoEstoqueServiceImpl implements MovimentacaoEstoqueServic
         }
         final Page<MovimentacaoEstoque> page = movimentacaoEstoqueRepository.findAll(MovimentacaoEstoqueSpecs.byFiltro(filtro),
                 toPageableSeguro(pageable));
-        // Uma consulta para os nomes da página inteira, em vez de uma por movimentação.
-        final Map<Long, String> nomesProdutos = produtoService.findNomesProdutosByIds(page.getContent().stream()
+        // Uma consulta para os produtos da página inteira, em vez de uma por movimentação.
+        final Map<Long, Produto> produtos = produtoService.findProdutosByIds(page.getContent().stream()
                 .map(MovimentacaoEstoque::getProdutoId)
                 .collect(Collectors.toSet()));
         return PaginaResponse.of(page.map(movimentacao ->
-                toMovimentacaoEstoqueResponse(movimentacao, nomesProdutos.get(movimentacao.getProdutoId()))));
+                toMovimentacaoEstoqueResponse(movimentacao, produtos.get(movimentacao.getProdutoId()))));
     }
 
     @Override
@@ -63,8 +63,8 @@ public class MovimentacaoEstoqueServiceImpl implements MovimentacaoEstoqueServic
     public MovimentacaoEstoqueResponse findMovimentacaoById(final Long id) {
         final MovimentacaoEstoque movimentacao = movimentacaoEstoqueRepository.findById(id)
                 .orElseThrow(() -> BusinessException.notFound(ErrorMessage.MOVIMENTACAO_NAO_ENCONTRADA));
-        final String produtoNome = produtoService.findNomesProdutosByIds(Set.of(movimentacao.getProdutoId())).get(movimentacao.getProdutoId());
-        return toMovimentacaoEstoqueResponse(movimentacao, produtoNome);
+        final Produto produto = produtoService.findProdutosByIds(Set.of(movimentacao.getProdutoId())).get(movimentacao.getProdutoId());
+        return toMovimentacaoEstoqueResponse(movimentacao, produto);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class MovimentacaoEstoqueServiceImpl implements MovimentacaoEstoqueServic
         final Produto produto = produtoService.findProdutoAtivoForMovimentacao(request.produtoId());
         final MovimentacaoEstoque movimentacao = movimentar(produto, request.tipo(), request.quantidade(), OrigemMovimentacao.AJUSTE,
                 request.motivo(), null, usuarioId);
-        return toMovimentacaoEstoqueResponse(movimentacao, produto.getNome());
+        return toMovimentacaoEstoqueResponse(movimentacao, produto);
     }
 
     // MANDATORY: o estoque só pode mudar junto com a compra/venda que o justifica.
@@ -108,8 +108,9 @@ public class MovimentacaoEstoqueServiceImpl implements MovimentacaoEstoqueServic
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), ordenacao);
     }
 
-    private static MovimentacaoEstoqueResponse toMovimentacaoEstoqueResponse(final MovimentacaoEstoque movimentacao, final String produtoNome) {
-        return new MovimentacaoEstoqueResponse(movimentacao.getId(), movimentacao.getProdutoId(), produtoNome, movimentacao.getTipo(),
+    private static MovimentacaoEstoqueResponse toMovimentacaoEstoqueResponse(final MovimentacaoEstoque movimentacao, final Produto produto) {
+        return new MovimentacaoEstoqueResponse(movimentacao.getId(), movimentacao.getProdutoId(),
+                produto == null ? null : produto.getNome(), produto == null ? null : produto.getUnidadeMedida(), movimentacao.getTipo(),
                 movimentacao.getOrigem(), movimentacao.getQuantidade(), movimentacao.getSaldoApos(), movimentacao.getMotivo(),
                 movimentacao.getReferenciaId(), movimentacao.getUsuarioId(), movimentacao.getCriadoEm());
     }
